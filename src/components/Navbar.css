@@ -1,0 +1,226 @@
+/*
+ * SNAPSMART navbar interaction enhancements.
+ *
+ * This file adds:
+ * - active section highlighting
+ * - animated navigation underline
+ * - smoother hover transitions
+ * - fixed-header scroll spacing
+ */
+
+/* Smooth scrolling fallback */
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * Prevent the fixed navbar from covering section titles
+ * after scrolling to an anchor.
+ */
+#home,
+#packages,
+#how-it-works,
+#about,
+#contact {
+  scroll-margin-top: 105px;
+}
+
+/* ---------------------------------------------------------
+   MAIN NAV LINKS
+   --------------------------------------------------------- */
+
+.navbar-links a {
+  position: relative;
+
+  transition:
+    color 280ms ease,
+    opacity 280ms ease;
+}
+
+/*
+ * Animated underline.
+ *
+ * This overrides the original hover underline while keeping
+ * the same clean aesthetic.
+ */
+.navbar-links a::after {
+  position: absolute;
+  right: 0;
+  bottom: -9px;
+  left: 0;
+
+  height: 2px;
+
+  content: "";
+
+  background: var(--accent);
+
+  transform: scaleX(0);
+  transform-origin: center;
+
+  transition:
+    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 280ms ease;
+}
+
+/* Hover */
+.navbar-links a:hover {
+  color: var(--ink);
+}
+
+.navbar-links a:hover::after {
+  transform: scaleX(0.45);
+}
+
+/* Current page / current homepage section */
+.navbar-links a.active {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.navbar-links a.active::after {
+  transform: scaleX(1);
+}
+
+/*
+ * The active state transitions seamlessly as the user
+ * moves from one homepage section to another.
+ */
+.navbar-section-link {
+  transition:
+    color 300ms ease,
+    font-weight 300ms ease;
+}
+
+/* ---------------------------------------------------------
+   LOGIN
+   --------------------------------------------------------- */
+
+.navbar-login {
+  position: relative;
+
+  transition:
+    color 260ms ease,
+    opacity 260ms ease;
+}
+
+.navbar-login::after {
+  position: absolute;
+  right: 0;
+  bottom: -7px;
+  left: 0;
+
+  height: 1px;
+
+  content: "";
+
+  background: var(--accent);
+
+  transform: scaleX(0);
+  transform-origin: center;
+
+  transition: transform 280ms ease;
+}
+
+.navbar-login:hover::after,
+.navbar-login.active::after {
+  transform: scaleX(1);
+}
+
+.navbar-login.active {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------------
+   LOGGED-IN NAVIGATION
+   --------------------------------------------------------- */
+
+.navbar-notification {
+  transition:
+    color 260ms ease,
+    opacity 260ms ease;
+}
+
+.navbar-notification.active {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.navbar-notification.active .notification-dot {
+  transform: scale(1.25);
+
+  box-shadow:
+    0 0 0 4px rgba(138, 110, 88, 0.13);
+}
+
+.notification-dot {
+  transition:
+    transform 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.navbar-account-button {
+  transition:
+    background-color 260ms ease,
+    color 260ms ease,
+    border-color 260ms ease,
+    transform 180ms ease;
+}
+
+.navbar-account-button:hover {
+  transform: translateY(-1px);
+}
+
+.navbar-account-button.active {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 940px) {
+  /*
+   * Desktop underline does not fit the stacked mobile menu,
+   * so use a subtle left highlight instead.
+   */
+  .navbar-links a::after {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: -24px;
+
+    width: 3px;
+    height: 24px;
+
+    transform:
+      translateY(-50%)
+      scaleY(0);
+
+    transform-origin: center;
+  }
+
+  .navbar-links a:hover::after {
+    transform:
+      translateY(-50%)
+      scaleY(0.45);
+  }
+
+  .navbar-links a.active::after {
+    transform:
+      translateY(-50%)
+      scaleY(1);
+  }
+
+  .navbar-links a.active {
+    padding-left: 8px;
+  }
+
+  .navbar-links a {
+    transition:
+      color 260ms ease,
+      padding-left 260ms ease;
+  }
+}

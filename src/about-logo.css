@@ -1,0 +1,49 @@
+/* =========================================================
+   ABOUT SECTION — TONI PHOTOGRAPHY LOGO
+   ========================================================= */
+
+.about-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.about-label::after {
+  width: min(300px, 100%);
+  height: 300px;
+
+  display: block;
+
+  margin-top: 55px;
+
+  content: "";
+
+  background-image: url("/toni-logo.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* Tablet */
+@media (max-width: 940px) {
+  .about-label::after {
+    width: 240px;
+    height: 240px;
+    margin-top: 30px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 720px) {
+  .about-label {
+    align-items: center;
+    text-align: center;
+  }
+
+  .about-label::after {
+    width: 200px;
+    height: 200px;
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+}
