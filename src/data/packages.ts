@@ -6,6 +6,7 @@ export interface PhotographyPackage {
   subtitle: string;
   coverageType: PackageType;
   price: number;
+  requiredDownPayment: number;
   isPopular?: boolean;
   inclusions: string[];
   requiresPhotographer: boolean;
@@ -19,6 +20,7 @@ export const photographyPackages: PhotographyPackage[] = [
     subtitle: "Photo Coverage Only",
     coverageType: "photo",
     price: 9000,
+    requiredDownPayment: 3000,
     inclusions: [
       "Coffee Table Album (100pcs 5R Pictures)",
       "Photoshoot / Pre-Nuptial Shoot",
@@ -35,6 +37,7 @@ export const photographyPackages: PhotographyPackage[] = [
     subtitle: "Photo & Video Coverage",
     coverageType: "photo_video",
     price: 16000,
+    requiredDownPayment: 3000,
     isPopular: true,
     inclusions: [
       "Coffee Table Album",
@@ -53,6 +56,7 @@ export const photographyPackages: PhotographyPackage[] = [
     subtitle: "Photo & Video Coverage with Guestbook",
     coverageType: "photo_video",
     price: 19000,
+    requiredDownPayment: 5000,
     inclusions: [
       "Coffee Table Album",
       "Photoshoot / Pre-Nuptial Shoot",
@@ -71,6 +75,7 @@ export const photographyPackages: PhotographyPackage[] = [
     subtitle: "Photo & Video Coverage",
     coverageType: "photo_video",
     price: 30000,
+    requiredDownPayment: 5000,
     inclusions: [
       "40-Page Magazine Album (8x10)",
       "Pre-Nuptial Shoot",
@@ -92,6 +97,7 @@ export const photographyPackages: PhotographyPackage[] = [
     subtitle: "Soft Copies Only",
     coverageType: "soft_copy",
     price: 4500,
+    requiredDownPayment: 2000,
     inclusions: ["Whole Event Soft Copies", "8GB Flash Drive"],
     requiresPhotographer: true,
     requiresVideographer: false,
@@ -102,6 +108,7 @@ export const photographyPackages: PhotographyPackage[] = [
     subtitle: "Soft Copies Only with Photoshoot",
     coverageType: "soft_copy",
     price: 6500,
+    requiredDownPayment: 2000,
     inclusions: [
       "Whole Event Soft Copies",
       "8GB Flash Drive",

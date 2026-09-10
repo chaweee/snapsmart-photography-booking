@@ -24,13 +24,13 @@ interface TeamMember {
 const mockTeamMembers: TeamMember[] = [
   {
     id: "TM-001",
-    fullName: "Toni Villacoba",
+    fullName: "Charlie Foot",
     email: "toni@example.com",
     phone: "0917 123 4567",
     role: "Photographer & Videographer",
     status: "Active",
     canLogin: true,
-    profilePhoto: "https://i.pravatar.cc/160?img=12",
+    profilePhoto: "/chaw.jpg",
     assignedEvents: 8,
     nextEvent: "Sept. 18, 2026",
   },

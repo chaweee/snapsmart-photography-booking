@@ -1,226 +1,331 @@
-/*
- * SNAPSMART navbar interaction enhancements.
- *
- * This file adds:
- * - active section highlighting
- * - animated navigation underline
- * - smoother hover transitions
- * - fixed-header scroll spacing
- */
-
-/* Smooth scrolling fallback */
-html {
-  scroll-behavior: smooth;
-}
-
-/*
- * Prevent the fixed navbar from covering section titles
- * after scrolling to an anchor.
- */
-#home,
-#packages,
-#how-it-works,
-#about,
-#contact {
-  scroll-margin-top: 105px;
-}
-
-/* ---------------------------------------------------------
-   MAIN NAV LINKS
-   --------------------------------------------------------- */
-
-.navbar-links a {
-  position: relative;
-
-  transition:
-    color 280ms ease,
-    opacity 280ms ease;
-}
-
-/*
- * Animated underline.
- *
- * This overrides the original hover underline while keeping
- * the same clean aesthetic.
- */
-.navbar-links a::after {
-  position: absolute;
+.site-header {
+  position: fixed;
+  top: 0;
   right: 0;
-  bottom: -9px;
   left: 0;
-
-  height: 2px;
-
-  content: "";
-
-  background: var(--accent);
-
-  transform: scaleX(0);
-  transform-origin: center;
-
-  transition:
-    transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
-    background-color 280ms ease;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(39, 33, 28, 0.1);
+  background: rgba(251, 250, 248, 0.92);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 0 4px 24px rgba(30, 24, 20, 0.04);
 }
 
-/* Hover */
-.navbar-links a:hover {
-  color: var(--ink);
+.navbar-container {
+  width: min(1280px, calc(100% - 48px));
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
 }
 
-.navbar-links a:hover::after {
-  transform: scaleX(0.45);
+.navbar-brand {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 12px;
+  color: #29221e;
+  text-decoration: none;
 }
 
-/* Current page / current homepage section */
-.navbar-links a.active {
-  color: var(--ink);
+.navbar-brand:hover {
+  color: #29221e;
+}
+
+.navbar-brand-mark {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem;
+  font-style: italic;
+}
+
+.navbar-brand-copy {
+  display: flex;
+  flex-direction: column;
+}
+
+.navbar-brand-name {
+  color: #29221e;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.navbar-brand-subtitle {
+  margin-top: 2px;
+  color: #5e554e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.72rem;
+  font-style: italic;
+  opacity: 0.75;
+}
+
+.navbar-navigation {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 34px;
+}
+
+.navbar-links,
+.navbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-links {
+  gap: 28px;
+}
+
+.navbar-actions {
+  gap: 18px;
+}
+
+.navbar-links a,
+.navbar-links .navbar-link,
+.navbar-login,
+.navbar-notification {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #5e554e !important;
+  text-decoration: none;
+  font-size: 0.77rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
-.navbar-links a.active::after {
-  transform: scaleX(1);
+.navbar-links a:visited,
+.navbar-links .navbar-link:visited,
+.navbar-login:visited,
+.navbar-notification:visited {
+  color: #5e554e !important;
 }
 
-/*
- * The active state transitions seamlessly as the user
- * moves from one homepage section to another.
- */
-.navbar-section-link {
-  transition:
-    color 300ms ease,
-    font-weight 300ms ease;
+.navbar-links a:hover,
+.navbar-links .navbar-link:hover,
+.navbar-login:hover,
+.navbar-notification:hover {
+  color: #29221e !important;
 }
 
-/* ---------------------------------------------------------
-   LOGIN
-   --------------------------------------------------------- */
-
-.navbar-login {
-  position: relative;
-
-  transition:
-    color 260ms ease,
-    opacity 260ms ease;
-}
-
-.navbar-login::after {
+.navbar-links a::after,
+.navbar-links .navbar-link::after {
   position: absolute;
   right: 0;
-  bottom: -7px;
+  bottom: -8px;
   left: 0;
-
   height: 1px;
-
   content: "";
-
-  background: var(--accent);
-
+  background: #29221e;
   transform: scaleX(0);
-  transform-origin: center;
-
-  transition: transform 280ms ease;
+  transition: transform 160ms ease;
 }
 
-.navbar-login:hover::after,
-.navbar-login.active::after {
+.navbar-links a:hover::after,
+.navbar-links .navbar-link:hover::after,
+.navbar-links .navbar-link.active::after {
   transform: scaleX(1);
 }
 
-.navbar-login.active {
-  color: var(--ink);
-  font-weight: 700;
+.navbar-links .navbar-link.active {
+  color: #29221e !important;
+  font-weight: 900;
 }
-
-/* ---------------------------------------------------------
-   LOGGED-IN NAVIGATION
-   --------------------------------------------------------- */
 
 .navbar-notification {
-  transition:
-    color 260ms ease,
-    opacity 260ms ease;
-}
-
-.navbar-notification.active {
-  color: var(--ink);
-  font-weight: 700;
-}
-
-.navbar-notification.active .notification-dot {
-  transform: scale(1.25);
-
-  box-shadow:
-    0 0 0 4px rgba(138, 110, 88, 0.13);
+  gap: 7px;
 }
 
 .notification-dot {
-  transition:
-    transform 260ms ease,
-    box-shadow 260ms ease;
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #9a725c;
 }
 
+.navbar-book-button,
 .navbar-account-button {
-  transition:
-    background-color 260ms ease,
-    color 260ms ease,
-    border-color 260ms ease,
-    transform 180ms ease;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #29221e;
+  padding: 0 19px;
+  color: #fff !important;
+  background: #29221e;
+  text-decoration: none;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
 }
 
+.navbar-book-button:visited,
+.navbar-account-button:visited {
+  color: #fff !important;
+}
+
+.navbar-book-button:hover,
 .navbar-account-button:hover {
-  transform: translateY(-1px);
+  color: #fff !important;
+  background: #39312b;
 }
 
-.navbar-account-button.active {
-  border-color: var(--accent);
-  background: var(--accent);
+.navbar-logout-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  padding: 0;
+  color: #5e554e !important;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.77rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-/* ---------------------------------------------------------
-   MOBILE
-   --------------------------------------------------------- */
+.navbar-logout-button:hover {
+  color: #29221e !important;
+}
+
+.navbar-logout-button::after {
+  position: absolute;
+  right: 0;
+  bottom: -8px;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: #29221e;
+  transform: scaleX(0);
+  transition: transform 160ms ease;
+}
+
+.navbar-logout-button:hover::after {
+  transform: scaleX(1);
+}
+
+.mobile-menu-button {
+  display: none;
+}
 
 @media (max-width: 940px) {
-  /*
-   * Desktop underline does not fit the stacked mobile menu,
-   * so use a subtle left highlight instead.
-   */
-  .navbar-links a::after {
-    top: 50%;
-    right: auto;
-    bottom: auto;
-    left: -24px;
-
-    width: 3px;
-    height: 24px;
-
-    transform:
-      translateY(-50%)
-      scaleY(0);
-
-    transform-origin: center;
+  .navbar-container {
+    min-height: 74px;
   }
 
-  .navbar-links a:hover::after {
-    transform:
-      translateY(-50%)
-      scaleY(0.45);
+  .mobile-menu-button {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    border: 0;
+    margin-left: auto;
+    padding: 6px;
+    background: transparent;
+    cursor: pointer;
   }
 
-  .navbar-links a.active::after {
-    transform:
-      translateY(-50%)
-      scaleY(1);
+  .mobile-menu-button span {
+    width: 100%;
+    height: 1px;
+    background: #29221e;
+    transition: transform 160ms ease;
   }
 
-  .navbar-links a.active {
-    padding-left: 8px;
+  .mobile-menu-button.active span:first-child {
+    transform: translateY(6px) rotate(45deg);
   }
 
-  .navbar-links a {
-    transition:
-      color 260ms ease,
-      padding-left 260ms ease;
+  .mobile-menu-button.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .mobile-menu-button.active span:last-child {
+    transform: translateY(-6px) rotate(-45deg);
+  }
+
+  .navbar-navigation {
+    position: absolute;
+    top: 74px;
+    right: 0;
+    left: 0;
+    display: none;
+    align-items: stretch;
+    border-top: 1px solid #e5dfd9;
+    padding: 24px;
+    background: #fbfaf8;
+    box-shadow: 0 25px 50px rgba(36, 29, 24, 0.08);
+  }
+
+  .navbar-navigation.mobile-open {
+    display: block;
+  }
+
+  .navbar-links,
+  .navbar-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .navbar-links {
+    gap: 0;
+  }
+
+  .navbar-links a,
+  .navbar-links .navbar-link,
+  .navbar-logout-button {
+    border-bottom: 1px solid #ece7e2;
+    padding: 14px 0;
+  }
+
+  .navbar-links a::after,
+  .navbar-links .navbar-link::after,
+  .navbar-logout-button::after {
+    display: none;
+  }
+
+  .navbar-logout-button {
+    width: 100%;
+    text-align: left;
+  }
+
+  .navbar-actions {
+    gap: 12px;
+    padding-top: 20px;
+  }
+
+  .navbar-book-button,
+  .navbar-account-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-container {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .navbar-brand-mark {
+    width: 35px;
+    height: 35px;
+  }
+
+  .navbar-brand-name {
+    font-size: 0.69rem;
+  }
+
+  .navbar-brand-subtitle {
+    font-size: 0.65rem;
   }
 }

@@ -1,10 +1,14 @@
-import { FormEvent, useMemo, useState } from "react";
+import {
+  type FormEvent,
+  type MouseEvent,
+  type TouchEvent,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import {
-  formatPeso,
-  photographyPackages,
-} from "../data/packages";
+import { formatPeso, photographyPackages } from "../data/packages";
 import "./BookingPage.css";
 
 const photographers = [
@@ -14,13 +18,11 @@ const photographers = [
   "Photographer B",
 ];
 
-const videographers = [
-  "No Preference",
-  "Videographer A",
-  "Videographer B",
-];
+const videographers = ["No Preference", "Videographer A", "Videographer B"];
 
 function BookingPage() {
+  const isClientLoggedIn =
+    localStorage.getItem("snapsmartMockUser") === "client";
   const [selectedPackageId, setSelectedPackageId] = useState(
     photographyPackages[0].id,
   );
@@ -28,29 +30,110 @@ function BookingPage() {
   const [paymentMethod, setPaymentMethod] = useState("GCash");
   const [message, setMessage] = useState("");
 
+  const signatureCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const isSigningRef = useRef(false);
+
   const selectedPackage = useMemo(
     () =>
-      photographyPackages.find(
-        (item) => item.id === selectedPackageId,
-      ) ?? photographyPackages[0],
+      photographyPackages.find((item) => item.id === selectedPackageId) ??
+      photographyPackages[0],
     [selectedPackageId],
   );
 
-  const estimatedDownPayment = Math.ceil(selectedPackage.price * 0.3);
-  const estimatedBalance =
-    selectedPackage.price - estimatedDownPayment;
+  const requiredDownPayment = selectedPackage.requiredDownPayment;
+  const remainingBalance = selectedPackage.price - requiredDownPayment;
+
+  const getCanvasPoint = (
+    event: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const canvas = signatureCanvasRef.current;
+
+    if (!canvas) {
+      return { x: 0, y: 0 };
+    }
+
+    const rect = canvas.getBoundingClientRect();
+
+    if ("touches" in event) {
+      return {
+        x: event.touches[0].clientX - rect.left,
+        y: event.touches[0].clientY - rect.top,
+      };
+    }
+
+    return {
+      x: event.clientX - rect.left,
+      y: event.clientY - rect.top,
+    };
+  };
+
+  const startSignature = (
+    event: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>,
+  ) => {
+    const canvas = signatureCanvasRef.current;
+    const context = canvas?.getContext("2d");
+
+    if (!canvas || !context) {
+      return;
+    }
+
+    isSigningRef.current = true;
+
+    const point = getCanvasPoint(event);
+
+    context.beginPath();
+    context.moveTo(point.x, point.y);
+  };
+
+  const drawSignature = (
+    event: MouseEvent<HTMLCanvasElement> | TouchEvent<HTMLCanvasElement>,
+  ) => {
+    if (!isSigningRef.current) {
+      return;
+    }
+
+    const canvas = signatureCanvasRef.current;
+    const context = canvas?.getContext("2d");
+
+    if (!canvas || !context) {
+      return;
+    }
+
+    const point = getCanvasPoint(event);
+
+    context.lineWidth = 2;
+    context.lineCap = "round";
+    context.strokeStyle = "#29221e";
+    context.lineTo(point.x, point.y);
+    context.stroke();
+  };
+
+  const stopSignature = () => {
+    isSigningRef.current = false;
+  };
+
+  const clearSignature = () => {
+    const canvas = signatureCanvasRef.current;
+    const context = canvas?.getContext("2d");
+
+    if (!canvas || !context) {
+      return;
+    }
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+  };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setMessage(
-      "Booking form is ready. Next, we will connect this to Supabase, payment proof upload, and e-signature storage.",
+      "Booking request submitted. The booking will remain pending until the down payment proof is verified by the admin.",
     );
   };
 
   return (
     <div className="booking-page">
-      <Navbar isLoggedIn={false} />
+      <Navbar isLoggedIn={isClientLoggedIn} />
 
       <main className="booking-main">
         <section className="booking-hero">
@@ -65,8 +148,9 @@ function BookingPage() {
 
               <p>
                 Choose your package, provide your event details, select your
-                preferred photographer or videographer, e-sign the agreement,
-                and submit your down payment proof for verification.
+                preferred photographer or videographer, review the booking
+                agreement, sign electronically, and submit your down payment
+                proof for verification.
               </p>
             </div>
 
@@ -80,13 +164,13 @@ function BookingPage() {
               </div>
 
               <div className="summary-row">
-                <span>Estimated down payment</span>
-                <strong>{formatPeso(estimatedDownPayment)}</strong>
+                <span>Required down payment</span>
+                <strong>{formatPeso(requiredDownPayment)}</strong>
               </div>
 
               <div className="summary-row">
-                <span>Estimated remaining balance</span>
-                <strong>{formatPeso(estimatedBalance)}</strong>
+                <span>Remaining balance</span>
+                <strong>{formatPeso(remainingBalance)}</strong>
               </div>
             </div>
           </div>
@@ -119,7 +203,10 @@ function BookingPage() {
 
                       <strong>{item.name}</strong>
 
-                      <small>{item.subtitle}</small>
+                      <small>
+                        DP {formatPeso(item.requiredDownPayment)} •{" "}
+                        {item.subtitle}
+                      </small>
                     </div>
 
                     <b>{formatPeso(item.price)}</b>
@@ -200,9 +287,7 @@ function BookingPage() {
                     <select
                       name="eventType"
                       value={eventType}
-                      onChange={(event) =>
-                        setEventType(event.target.value)
-                      }
+                      onChange={(event) => setEventType(event.target.value)}
                       required
                     >
                       <option>Wedding</option>
@@ -224,16 +309,8 @@ function BookingPage() {
                   </label>
 
                   <label className="booking-field">
-                    <span>Booking Source</span>
-
-                    <select name="bookingSource" required>
-                      <option>Website</option>
-                      <option>Walk-in</option>
-                      <option>Facebook Messenger</option>
-                      <option>Phone</option>
-                      <option>Referral</option>
-                      <option>Other</option>
-                    </select>
+                    <span>End Time</span>
+                    <input name="endTime" type="time" required />
                   </label>
 
                   <label className="booking-field full">
@@ -248,7 +325,7 @@ function BookingPage() {
                   {eventType === "Wedding" && (
                     <>
                       <label className="booking-field">
-                        <span>Bride's Full Name</span>
+                        <span>Bride&apos;s Full Name</span>
                         <input
                           name="brideName"
                           type="text"
@@ -258,7 +335,7 @@ function BookingPage() {
                       </label>
 
                       <label className="booking-field">
-                        <span>Groom's Full Name</span>
+                        <span>Groom&apos;s Full Name</span>
                         <input
                           name="groomName"
                           type="text"
@@ -331,24 +408,51 @@ function BookingPage() {
               <section className="booking-form-section">
                 <div className="form-section-heading">
                   <p className="booking-eyebrow">STEP 5</p>
-                  <h2>Agreement & e-signature</h2>
+                  <h2>Booking Agreement</h2>
                 </div>
 
                 <label className="agreement-box">
                   <input name="agreement" type="checkbox" required />
 
                   <span>
-                    I confirm that the booking information is correct and I
-                    agree to Toni Photography's booking terms, payment
-                    requirements, cancellation policy, and privacy terms.
+                    I confirm that the booking information is correct. I agree
+                    that this request will only be confirmed after the required
+                    down payment has been verified by the admin. I also agree to
+                    Toni Photography&apos;s booking terms, payment requirements,
+                    cancellation policy, and privacy terms.
                   </span>
                 </label>
 
-                <div className="signature-placeholder">
-                  <span>E-Signature Area</span>
+                <div className="client-signature-box">
+                  <div className="client-signature-heading">
+                    <div>
+                      <span>Client E-Signature</span>
+                      <strong>Sign inside the box</strong>
+                    </div>
+
+                    <button type="button" onClick={clearSignature}>
+                      Clear Signature
+                    </button>
+                  </div>
+
+                  <canvas
+                    ref={signatureCanvasRef}
+                    width={820}
+                    height={220}
+                    className="signature-canvas"
+                    onMouseDown={startSignature}
+                    onMouseMove={drawSignature}
+                    onMouseUp={stopSignature}
+                    onMouseLeave={stopSignature}
+                    onTouchStart={startSignature}
+                    onTouchMove={drawSignature}
+                    onTouchEnd={stopSignature}
+                  />
+
                   <p>
-                    We will add a drawable signature pad here before connecting
-                    the final booking submission.
+                    This signature will be attached to the booking agreement.
+                    Once the booking is confirmed, the signed agreement can be
+                    viewed inside My Bookings.
                   </p>
                 </div>
               </section>
@@ -366,13 +470,95 @@ function BookingPage() {
                   </div>
 
                   <div>
-                    <span>Estimated Down Payment</span>
-                    <strong>{formatPeso(estimatedDownPayment)}</strong>
+                    <span>Required Down Payment</span>
+                    <strong>{formatPeso(requiredDownPayment)}</strong>
                   </div>
 
                   <div>
-                    <span>Estimated Balance</span>
-                    <strong>{formatPeso(estimatedBalance)}</strong>
+                    <span>Remaining Balance</span>
+                    <strong>{formatPeso(remainingBalance)}</strong>
+                  </div>
+                </div>
+
+                <div className="exact-payment-alert">
+                  <strong>Send exact down payment amount only.</strong>
+                  <p>
+                    Please send exactly {formatPeso(requiredDownPayment)}. If
+                    the amount is lower, the booking will stay pending until the
+                    remaining amount is submitted and verified.
+                  </p>
+                </div>
+
+                <div className="client-payment-reference">
+                  <div className="client-payment-preview">
+                    {paymentMethod === "GCash" ? (
+                      <>
+                        <div className="mock-gcash-qr">
+                          <span />
+                          <span />
+                          <span />
+                          <span />
+                          <span />
+                          <span />
+                          <span />
+                          <span />
+                          <span />
+                        </div>
+
+                        <strong>GCash QR Code</strong>
+                        <p>Scan this QR and send the exact amount shown.</p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="mock-bank-card">BANK</div>
+
+                        <strong>Bank Transfer</strong>
+                        <p>Use the account details shown beside this box.</p>
+                      </>
+                    )}
+                  </div>
+
+                  <div className="client-payment-details">
+                    <div>
+                      <span>Amount to Send</span>
+                      <strong>{formatPeso(requiredDownPayment)}</strong>
+                    </div>
+
+                    <div>
+                      <span>Payment For</span>
+                      <strong>{selectedPackage.name}</strong>
+                    </div>
+
+                    {paymentMethod === "GCash" ? (
+                      <>
+                        <div>
+                          <span>GCash Account Name</span>
+                          <strong>Toni Photography</strong>
+                        </div>
+
+                        <div>
+                          <span>GCash Number</span>
+                          <strong>09XX XXX XXXX</strong>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <span>Bank Name</span>
+                          <strong>Sample Bank</strong>
+                        </div>
+
+                        <div>
+                          <span>Account Name</span>
+                          <strong>Toni Photography</strong>
+                        </div>
+
+                        <div>
+                          <span>Account Number</span>
+                          <strong>0000 0000 0000</strong>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -383,9 +569,7 @@ function BookingPage() {
                     <select
                       name="paymentMethod"
                       value={paymentMethod}
-                      onChange={(event) =>
-                        setPaymentMethod(event.target.value)
-                      }
+                      onChange={(event) => setPaymentMethod(event.target.value)}
                       required
                     >
                       <option>GCash</option>
@@ -426,9 +610,9 @@ function BookingPage() {
                   <strong>{paymentMethod} Instructions</strong>
 
                   <p>
-                    Payment account details will come from the admin settings.
-                    For now, this section is prepared for GCash and bank
-                    transfer proof upload.
+                    Send the exact required down payment, then upload your
+                    payment proof. The admin will verify the amount before the
+                    booking is confirmed.
                   </p>
                 </div>
               </section>
@@ -441,9 +625,7 @@ function BookingPage() {
                   only after the down payment is verified by the admin.
                 </p>
 
-                {message && (
-                  <div className="booking-message">{message}</div>
-                )}
+                {message && <div className="booking-message">{message}</div>}
               </div>
 
               <Link to="/" className="booking-back-link">

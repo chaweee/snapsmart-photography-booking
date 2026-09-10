@@ -22,17 +22,22 @@ function AuthPage() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (isLogin) {
-      setMessage(
-        "Login UI is ready. Supabase authentication will be connected next.",
-      );
+    const formData = new FormData(event.currentTarget);
 
+    const email = String(formData.get("email") ?? "");
+    const password = String(formData.get("password") ?? "");
+
+    if (isLogin) {
+      if (email === "client@gmail.com" && password === "client") {
+        localStorage.setItem("snapsmartMockUser", "client");
+        navigate("/client/bookings");
+        return;
+      }
+
+      setMessage("Invalid mock account. Use client@gmail.com and password client.");
       return;
     }
 
-    const formData = new FormData(event.currentTarget);
-
-    const password = String(formData.get("password") ?? "");
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
     if (password !== confirmPassword) {
@@ -121,7 +126,7 @@ function AuthPage() {
 
             <p>
               {isLogin
-                ? "Access your bookings, contracts, payments, and galleries."
+                ? "Access your bookings, agreements, payments, and galleries."
                 : "Create your client account to start booking photography services."}
             </p>
           </div>
@@ -186,8 +191,9 @@ function AuthPage() {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="client@gmail.com"
                 autoComplete="email"
+                defaultValue={isLogin ? "client@gmail.com" : ""}
                 required
               />
             </div>
@@ -216,9 +222,10 @@ function AuthPage() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
+                  placeholder={isLogin ? "client" : "Enter your password"}
                   autoComplete={isLogin ? "current-password" : "new-password"}
-                  minLength={8}
+                  defaultValue={isLogin ? "client" : ""}
+                  minLength={isLogin ? 1 : 8}
                   required
                 />
 
@@ -311,6 +318,13 @@ function AuthPage() {
               </div>
             )}
           </form>
+
+          {isLogin && (
+            <div className="form-message" role="note">
+              Mock Client Account: <strong>client@gmail.com</strong> /{" "}
+              <strong>client</strong>
+            </div>
+          )}
 
           <div className="switch-prompt">
             <span>

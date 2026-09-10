@@ -327,27 +327,70 @@
   accent-color: #29221e;
 }
 
-.signature-placeholder {
-  display: grid;
-  place-items: center;
-  min-height: 180px;
-  border: 1px dashed #b9aca1;
+.client-signature-box {
+  border: 1px solid #ded8d1;
   margin-top: 18px;
-  padding: 25px;
-  text-align: center;
-  background: #f7f3ef;
+  padding: 18px;
+  background: #fbfaf8;
 }
 
-.signature-placeholder span {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.5rem;
+.client-signature-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 14px;
 }
 
-.signature-placeholder p {
-  max-width: 430px;
-  margin: 10px 0 0;
+.client-signature-heading span {
+  display: block;
   color: #8b8178;
-  font-size: 0.8rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.client-signature-heading strong {
+  display: block;
+  margin-top: 5px;
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+.client-signature-heading button {
+  min-height: 40px;
+  border: 1px solid #29221e;
+  padding: 0 14px;
+  color: #29221e;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.client-signature-heading button:hover {
+  color: #fff;
+  background: #29221e;
+}
+
+.signature-canvas {
+  width: 100%;
+  height: 220px;
+  display: block;
+  border: 1px dashed #b9aca1;
+  background: #fff;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.client-signature-box p {
+  margin: 12px 0 0;
+  color: #8b8178;
+  font-size: 0.78rem;
   line-height: 1.6;
 }
 
@@ -380,6 +423,128 @@
   font-weight: 400;
 }
 
+.exact-payment-alert {
+  border: 1px solid #d6c8ba;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  background: #fff8e8;
+}
+
+.exact-payment-alert strong {
+  display: block;
+  color: #29221e;
+  font-size: 0.9rem;
+}
+
+.exact-payment-alert p {
+  margin: 7px 0 0;
+  color: #65584f;
+  font-size: 0.8rem;
+  line-height: 1.65;
+}
+
+.client-payment-reference {
+  display: grid;
+  grid-template-columns: 230px minmax(0, 1fr);
+  gap: 18px;
+  border: 1px solid #ded8d1;
+  margin-bottom: 22px;
+  padding: 18px;
+  background: #fbfaf8;
+}
+
+.client-payment-preview {
+  min-height: 250px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  border: 1px solid #eee7df;
+  padding: 18px;
+  text-align: center;
+  background: #fff;
+}
+
+.client-payment-preview strong {
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.18rem;
+  font-weight: 400;
+}
+
+.client-payment-preview p {
+  max-width: 180px;
+  margin: 0;
+  color: #746a62;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.mock-gcash-qr {
+  width: 145px;
+  height: 145px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  border: 8px solid #29221e;
+  padding: 9px;
+  background: #fff;
+}
+
+.mock-gcash-qr span {
+  background: #29221e;
+}
+
+.mock-gcash-qr span:nth-child(2),
+.mock-gcash-qr span:nth-child(4),
+.mock-gcash-qr span:nth-child(6),
+.mock-gcash-qr span:nth-child(8) {
+  background: #fff;
+  border: 3px solid #29221e;
+}
+
+.mock-bank-card {
+  width: 145px;
+  height: 145px;
+  display: grid;
+  place-items: center;
+  border: 8px solid #29221e;
+  color: #29221e;
+  background: #fff;
+  font-size: 1.7rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+.client-payment-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-content: start;
+}
+
+.client-payment-details div {
+  border-bottom: 1px solid #eee7df;
+  padding-bottom: 12px;
+}
+
+.client-payment-details span {
+  display: block;
+  color: #8b8178;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.client-payment-details strong {
+  display: block;
+  margin-top: 6px;
+  color: #29221e;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
 /* =========================================================
    CUSTOM FILE UPLOAD
    ========================================================= */
@@ -410,6 +575,10 @@
   display: none;
 }
 
+.file-upload-input {
+  display: none !important;
+}
+
 .file-upload-icon {
   width: 46px;
   height: 46px;
@@ -422,7 +591,7 @@
   font-weight: 800;
 }
 
-.file-upload-box strong {
+.file-upload-copy strong {
   display: block;
   color: #29221e;
   font-family: Georgia, "Times New Roman", serif;
@@ -430,7 +599,7 @@
   font-weight: 400;
 }
 
-.file-upload-box p {
+.file-upload-copy p {
   margin: 6px 0 0;
   color: #8b8178;
   font-size: 0.78rem;
@@ -446,10 +615,15 @@
   padding: 0 18px;
   color: #fff !important;
   background: #29221e;
+  cursor: pointer;
   font-size: 0.73rem !important;
   font-weight: 800 !important;
   letter-spacing: 0.03em;
   white-space: nowrap;
+}
+
+.file-upload-button:hover {
+  background: #3a312b;
 }
 
 .payment-instructions {
@@ -537,6 +711,16 @@
   }
 }
 
+@media (max-width: 760px) {
+  .client-payment-reference {
+    grid-template-columns: 1fr;
+  }
+
+  .client-payment-details {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 720px) {
   .booking-main {
     padding-top: 74px;
@@ -569,6 +753,19 @@
     grid-template-columns: 1fr;
   }
 
+  .client-signature-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .client-signature-heading button {
+    width: 100%;
+  }
+
+  .signature-canvas {
+    height: 190px;
+  }
+
   .file-upload-box {
     grid-template-columns: 1fr;
     text-align: center;
@@ -580,93 +777,5 @@
 
   .file-upload-button {
     width: 100%;
-  }
-}
-
-.file-upload-box {
-  min-height: 118px !important;
-  display: grid !important;
-  grid-template-columns: 46px 1fr auto !important;
-  align-items: center !important;
-  gap: 18px !important;
-  border: 1px dashed #b9aca1 !important;
-  padding: 22px !important;
-  background: #f7f3ef !important;
-  cursor: pointer !important;
-  transition:
-    border-color 180ms ease,
-    background 180ms ease,
-    transform 180ms ease;
-}
-
-.file-upload-box:hover {
-  border-color: #29221e !important;
-  background: #f2eee8 !important;
-  transform: translateY(-1px);
-}
-
-.file-upload-input {
-  display: none !important;
-}
-
-.file-upload-icon {
-  width: 46px !important;
-  height: 46px !important;
-  display: grid !important;
-  place-items: center !important;
-  border-radius: 50% !important;
-  color: #fff !important;
-  background: #29221e !important;
-  font-size: 1.1rem !important;
-  font-weight: 800 !important;
-}
-
-.file-upload-copy strong {
-  display: block !important;
-  color: #29221e !important;
-  font-family: Georgia, "Times New Roman", serif !important;
-  font-size: 1.15rem !important;
-  font-weight: 400 !important;
-}
-
-.file-upload-copy p {
-  margin: 6px 0 0 !important;
-  color: #8b8178 !important;
-  font-size: 0.78rem !important;
-  line-height: 1.5 !important;
-}
-
-.file-upload-button {
-  min-height: 42px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  border: 1px solid #29221e !important;
-  padding: 0 18px !important;
-  color: #fff !important;
-  background: #29221e !important;
-  cursor: pointer !important;
-  font-size: 0.73rem !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.03em !important;
-  white-space: nowrap !important;
-}
-
-.file-upload-button:hover {
-  background: #3a312b !important;
-}
-
-@media (max-width: 720px) {
-  .file-upload-box {
-    grid-template-columns: 1fr !important;
-    text-align: center !important;
-  }
-
-  .file-upload-icon {
-    margin: 0 auto !important;
-  }
-
-  .file-upload-button {
-    width: 100% !important;
   }
 }
