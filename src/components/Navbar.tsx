@@ -1,6 +1,9 @@
-import { useEffect, useState, type MouseEvent } from "react";
+import { useState, type FunctionComponent, type MouseEvent } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.css";
+import { supabase } from "../lib/supabase";
+import { useAuth } from "../auth/authContext";
+import ClientNotificationBell from "./ClientNotificationBell";
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -8,18 +11,21 @@ interface NavbarProps {
 
 type SectionId = "packages" | "how-it-works" | "about" | "contact";
 
-function Navbar({ isLoggedIn = false }: NavbarProps) {
+const Navbar: FunctionComponent<NavbarProps> = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { session, role, loading } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [menuPath, setMenuPath] = useState(location.pathname);
+
+  if (menuPath !== location.pathname) {
+    setMenuPath(location.pathname);
+    setIsMobileOpen(false);
+  }
 
   const closeMenu = () => {
     setIsMobileOpen(false);
   };
-
-  useEffect(() => {
-    closeMenu();
-  }, [location.pathname]);
 
   const handleSectionClick = (
     event: MouseEvent<HTMLAnchorElement>,
@@ -40,11 +46,14 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("snapsmartMockUser");
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      window.alert("Could not log out. Please try again.");
+      return;
+    }
     closeMenu();
     navigate("/");
-    window.location.reload();
   };
 
   const getLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -97,6 +106,10 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
         Book Now
       </NavLink>
 
+      <NavLink to="/portfolio" className={getLinkClass} onClick={closeMenu}>
+        Portfolio
+      </NavLink>
+
       <NavLink
         to="/client/bookings"
         className={getLinkClass}
@@ -111,19 +124,6 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
         onClick={closeMenu}
       >
         My Galleries
-      </NavLink>
-
-      <NavLink
-        to="/client/notifications"
-        className={({ isActive }) =>
-          isActive
-            ? "navbar-link navbar-notification active"
-            : "navbar-link navbar-notification"
-        }
-        onClick={closeMenu}
-      >
-        <span className="notification-dot" />
-        Notifications
       </NavLink>
 
     
@@ -150,6 +150,8 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
           </span>
         </Link>
 
+        {session && role === "client" && <ClientNotificationBell />}
+
         <button
           type="button"
           className={
@@ -171,17 +173,28 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
           }
         >
           <div className="navbar-links">
-            {isLoggedIn ? clientLinks : publicLinks}
+            {session && role === "client" ? clientLinks : publicLinks}
           </div>
 
-          {!isLoggedIn && (
+          {session && role !== "client" && (
+            <div className="navbar-actions">
+              <span className="navbar-role-label">
+                {loading ? "Loading account…" : role === "admin" ? "Admin account" : role === "photographer" ? "Photographer account" : role === "videographer" ? "Videographer account" : "Account"}
+              </span>
+              {role === "admin" && <Link to="/admin" className="navbar-account-button" onClick={closeMenu}>Admin Dashboard</Link>}
+              {(role === "photographer" || role === "videographer") && <Link to="/photographer" className="navbar-account-button" onClick={closeMenu}>Team Portal</Link>}
+              <button type="button" className="navbar-logout-button" onClick={handleLogout}>Log Out</button>
+            </div>
+          )}
+
+          {!session && !loading && (
             <div className="navbar-actions">
               <Link to="/login" className="navbar-login" onClick={closeMenu}>
                 Log In
               </Link>
 
               <Link
-                to="/book"
+                to="/login"
                 className="navbar-book-button"
                 onClick={closeMenu}
               >
@@ -193,6 +206,6 @@ function Navbar({ isLoggedIn = false }: NavbarProps) {
       </div>
     </header>
   );
-}
+};
 
 export default Navbar;

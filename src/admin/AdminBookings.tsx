@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Admin.css";
 
 type BookingStatus =
@@ -193,12 +194,18 @@ function getPaymentStatusClass(status: PaymentStatus) {
 }
 
 function AdminBookings() {
+  const navigate = useNavigate();
+  const [bookings, setBookings] = useState(mockBookings);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedBookingId, setSelectedBookingId] = useState(mockBookings[0].id);
+  const [activeModal, setActiveModal] = useState<"details" | "status" | null>(null);
+  const [draftStatus, setDraftStatus] = useState<BookingStatus>(
+    mockBookings[0].status,
+  );
 
   const filteredBookings = useMemo(() => {
-    return mockBookings.filter((booking) => {
+    return bookings.filter((booking) => {
       const searchValue = searchTerm.toLowerCase();
 
       const matchesSearch =
@@ -212,23 +219,56 @@ function AdminBookings() {
 
       return matchesSearch && matchesStatus;
     });
-  }, [searchTerm, statusFilter]);
+  }, [bookings, searchTerm, statusFilter]);
 
   const selectedBooking =
-    mockBookings.find((booking) => booking.id === selectedBookingId) ??
-    mockBookings[0];
+    bookings.find((booking) => booking.id === selectedBookingId) ?? bookings[0];
 
-  const totalBookings = mockBookings.length;
-  const pendingBookings = mockBookings.filter(
+  const totalBookings = bookings.length;
+  const pendingBookings = bookings.filter(
     (booking) =>
       booking.status === "Pending" || booking.status === "Awaiting Payment",
   ).length;
-  const confirmedBookings = mockBookings.filter(
+  const confirmedBookings = bookings.filter(
     (booking) => booking.status === "Confirmed",
   ).length;
-  const verificationBookings = mockBookings.filter(
+  const verificationBookings = bookings.filter(
     (booking) => booking.status === "For Verification",
   ).length;
+
+  const selectBooking = (bookingId: string) => {
+    setSelectedBookingId(bookingId);
+    const booking = bookings.find((item) => item.id === bookingId);
+    if (booking) setDraftStatus(booking.status);
+  };
+
+  const updateSelectedStatus = () => {
+    setBookings((currentBookings) =>
+      currentBookings.map((booking) =>
+        booking.id === selectedBooking.id
+          ? { ...booking, status: draftStatus }
+          : booking,
+      ),
+    );
+    setActiveModal(null);
+  };
+
+  const verifySelectedPayment = () => {
+    setBookings((currentBookings) =>
+      currentBookings.map((booking) =>
+        booking.id === selectedBooking.id
+          ? {
+              ...booking,
+              paymentStatus: "Down Payment Verified",
+              status:
+                booking.status === "For Verification"
+                  ? "Confirmed"
+                  : booking.status,
+            }
+          : booking,
+      ),
+    );
+  };
 
   return (
     <div className="admin-bookings-page">
@@ -317,7 +357,7 @@ function AdminBookings() {
                     className={
                       selectedBooking.id === booking.id ? "selected-row" : ""
                     }
-                    onClick={() => setSelectedBookingId(booking.id)}
+                    onClick={() => selectBooking(booking.id)}
                   >
                     <td>{booking.id}</td>
                     <td>
@@ -434,13 +474,131 @@ function AdminBookings() {
           </div>
 
           <div className="booking-detail-actions">
-            <button type="button">View Full Details</button>
-            <button type="button">Update Status</button>
-            <button type="button">Verify Payment</button>
-            <button type="button">Open Gallery</button>
+            <button type="button" onClick={() => setActiveModal("details")}>
+              View Full Details
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setDraftStatus(selectedBooking.status);
+                setActiveModal("status");
+              }}
+            >
+              Update Status
+            </button>
+            <button
+              type="button"
+              onClick={verifySelectedPayment}
+              disabled={selectedBooking.paymentStatus === "Fully Paid"}
+            >
+              Verify Payment
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate("/admin/galleries")}
+            >
+              Open Gallery
+            </button>
+          </div>
+          <div className="booking-agreement-placeholder" role="note">
+            <strong>E-agreement</strong>
+            <p>Agreement viewing and download will be available here once signed agreements are connected to Supabase. The bookings shown on this page are currently sample data.</p>
           </div>
         </aside>
       </section>
+
+      {activeModal && (
+        <div
+          className="booking-action-modal-backdrop"
+          role="presentation"
+          onClick={() => setActiveModal(null)}
+        >
+          <section
+            className="booking-action-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-action-modal-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="booking-action-modal-header">
+              <div>
+                <p>{activeModal === "details" ? "Booking Details" : "Update Booking"}</p>
+                <h2 id="booking-action-modal-title">
+                  {selectedBooking.clientName}
+                </h2>
+                <span>{selectedBooking.id} · {selectedBooking.packageName}</span>
+              </div>
+
+              <button
+                type="button"
+                className="booking-action-modal-close"
+                aria-label="Close booking action dialog"
+                onClick={() => setActiveModal(null)}
+              >
+                ×
+              </button>
+            </div>
+
+            {activeModal === "details" ? (
+              <div className="booking-action-modal-details">
+                <div><span>Event</span><strong>{selectedBooking.eventType}</strong></div>
+                <div><span>Date and Time</span><strong>{selectedBooking.eventDate} · {selectedBooking.time}</strong></div>
+                <div><span>Location</span><strong>{selectedBooking.location}</strong></div>
+                <div><span>Theme / Motif</span><strong>{selectedBooking.themeMotif}</strong></div>
+                <div><span>Contact</span><strong>{selectedBooking.email} · {selectedBooking.phone}</strong></div>
+                <div><span>Notes</span><strong>{selectedBooking.notes}</strong></div>
+              </div>
+            ) : (
+              <div className="booking-status-update">
+                <div className="booking-status-summary">
+                  <div>
+                    <span>Current Status</span>
+                    <strong className={getBookingStatusClass(selectedBooking.status)}>
+                      {selectedBooking.status}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>Selected Status</span>
+                    <strong className={getBookingStatusClass(draftStatus)}>
+                      {draftStatus}
+                    </strong>
+                  </div>
+                </div>
+
+                <div className="booking-status-options">
+                  <span>Choose New Status</span>
+                  <div>
+                    {statusOptions.slice(1).map((status) => (
+                      <button
+                        type="button"
+                        key={status}
+                        className={draftStatus === status ? "selected" : ""}
+                        onClick={() => setDraftStatus(status as BookingStatus)}
+                      >
+                        <strong className={getBookingStatusClass(status as BookingStatus)}>
+                          {status}
+                        </strong>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="booking-action-modal-footer">
+              <button type="button" onClick={() => setActiveModal(null)}>
+                Cancel
+              </button>
+              {activeModal === "status" && (
+                <button type="button" onClick={updateSelectedStatus}>
+                  Save Status
+                </button>
+              )}
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

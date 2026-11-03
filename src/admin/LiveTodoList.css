@@ -1,0 +1,49 @@
+.live-todo { display: grid; gap: 22px; color: #342b25; }
+.live-todo-header { display: flex; justify-content: space-between; align-items: end; gap: 20px; flex-wrap: wrap; }
+.live-todo-header p, .live-todo-panel-top > div > span, .live-todo-dialog-header p { margin: 0 0 8px; color: #987b65; font-size: .68rem; font-weight: 800; letter-spacing: .14em; }
+.live-todo-header h2 { margin: 0 0 8px; font: 400 2.6rem Georgia, serif; }
+.live-todo-header span { color: #807268; font-size: .85rem; }
+.live-todo-header > button, .live-todo-form-actions button:last-child { border: 1px solid #302821; padding: 12px 20px; color: white; background: #302821; cursor: pointer; font-weight: 700; }
+.live-todo-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.live-todo-summary > div { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 8px; border: 1px solid #e9e1da; border-top: 3px solid #a58870; padding: 18px 22px; background: white; }
+.live-todo-summary span { grid-column: 1 / -1; color: #88796e; font-size: .73rem; font-weight: 700; }
+.live-todo-summary strong { font: 400 2rem Georgia, serif; }
+.live-todo-summary small { color: #a09185; }
+.live-todo-notice, .live-todo-error { margin: 0; padding: 13px 16px; background: #f3f6ee; color: #486443; font-size: .82rem; }
+.live-todo-error { background: #fff0ed; color: #8d2e27; }
+.live-todo-panel { border: 1px solid #e9e1da; padding: 24px; background: white; }
+.live-todo-panel-top { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 22px; }
+.live-todo-panel-top h3 { margin: 0; font: 400 1.35rem Georgia, serif; }
+.live-todo-panel-top label { display: grid; gap: 5px; color: #88796e; font-size: .72rem; font-weight: 700; }
+.live-todo-panel-top select, .live-todo-dialog input, .live-todo-dialog select, .live-todo-dialog textarea { border: 1px solid #ded4ca; border-radius: 5px; padding: 10px 12px; color: #302821; background: white; font: inherit; }
+.live-todo-empty { border: 1px dashed #e5d9cd; padding: 38px 20px; color: #786b60; text-align: center; }
+.live-todo-empty p { margin-bottom: 0; font-size: .8rem; }
+.live-todo-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.live-todo-list li { display: flex; align-items: flex-start; gap: 14px; border: 1px solid #eee6de; padding: 16px; background: #fffdfb; }
+.live-todo-check input { width: 19px; height: 19px; margin: 2px 0 0; accent-color: #725641; cursor: pointer; }
+.live-todo-copy { flex: 1; min-width: 0; }
+.live-todo-copy > strong { overflow-wrap: anywhere; font-size: .9rem; }
+.live-todo-list .is-completed .live-todo-copy > strong { color: #9b9189; text-decoration: line-through; }
+.live-todo-copy p { margin: 7px 0 0; color: #7e7167; font-size: .8rem; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+.live-todo-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; color: #887a6e; font-size: .7rem; }
+.live-todo-meta span { border-radius: 99px; padding: 4px 9px; background: #f3eee9; }
+.live-todo-priority.high { color: #a34d42; background: #faeae5; }
+.live-todo-priority.low { color: #55734f; background: #edf4ea; }
+.live-todo-actions { display: flex; gap: 8px; }
+.live-todo-actions button { border: 1px solid #e1d8cf; padding: 7px 10px; color: #66574a; background: white; cursor: pointer; font-size: .72rem; }
+.live-todo button:disabled { opacity: .5; cursor: not-allowed; }
+.live-todo-backdrop { position: fixed; z-index: 1100; inset: 0; display: grid; place-items: center; padding: 18px; background: rgb(41 34 30 / 60%); }
+.live-todo-dialog { width: min(570px, 100%); max-height: 90vh; overflow-y: auto; border-radius: 10px; background: #fffdfb; box-shadow: 0 24px 70px rgb(41 34 30 / 24%); }
+.live-todo-dialog-header { display: flex; justify-content: space-between; gap: 20px; padding: 25px; color: white; background: #29221e; }
+.live-todo-dialog-header p { color: #d4b99f; }
+.live-todo-dialog-header h3 { margin: 0; font: 400 1.8rem Georgia, serif; }
+.live-todo-dialog-header button { align-self: start; border: 0; color: white; background: transparent; cursor: pointer; font-size: 1.6rem; }
+.live-todo-dialog form { display: grid; gap: 16px; padding: 25px; }
+.live-todo-dialog label { display: grid; gap: 7px; color: #51463d; font-size: .78rem; font-weight: 700; }
+.live-todo-dialog label span { color: #a39589; font-weight: 400; }
+.live-todo-dialog textarea { resize: vertical; }
+.live-todo-form-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.live-todo-dialog input, .live-todo-dialog select { min-width: 0; width: 100%; }
+.live-todo-form-actions { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee6de; padding-top: 16px; }
+.live-todo-form-actions button:first-child { border: 1px solid #ded4ca; padding: 10px 18px; background: white; cursor: pointer; }
+@media (max-width: 650px) { .live-todo-summary { grid-template-columns: 1fr; } .live-todo-panel-top { align-items: start; flex-direction: column; } .live-todo-list li { flex-wrap: wrap; } .live-todo-actions { margin-left: 33px; } .live-todo-form-grid { grid-template-columns: 1fr; } }

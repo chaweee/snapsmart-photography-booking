@@ -1221,6 +1221,7 @@
 
 .clean-gallery-photo {
   position: relative;
+  width: 100%;
   overflow: hidden;
   border: 0;
   padding: 0;
@@ -1419,7 +1420,7 @@
   font-weight: 900;
 }
 
-.gallery-lightbox-bottom a {
+.gallery-lightbox-bottom button:last-child {
   color: #29221e;
   background: #fff;
 }
@@ -1428,7 +1429,7 @@
   background: rgba(255, 255, 255, 0.12);
 }
 
-.gallery-lightbox-bottom a:hover {
+.gallery-lightbox-bottom button:last-child:hover {
   background: #e9ded6;
 }
 

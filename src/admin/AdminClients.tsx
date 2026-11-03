@@ -22,7 +22,6 @@ interface AdminClient {
   clientType: ClientType;
   status: ClientStatus;
   totalBookings: number;
-  totalSpent: string;
   lastBooking: string;
   notes: string;
   bookings: ClientBookingHistory[];
@@ -38,7 +37,6 @@ const adminClients: AdminClient[] = [
     clientType: "Online",
     status: "Active",
     totalBookings: 2,
-    totalSpent: "₱25,000",
     lastBooking: "Sept. 18, 2026",
     notes:
       "Preferred client for wedding and family events. Usually chooses photo and video coverage.",
@@ -70,7 +68,6 @@ const adminClients: AdminClient[] = [
     clientType: "Online",
     status: "Active",
     totalBookings: 1,
-    totalSpent: "₱9,000",
     lastBooking: "Oct. 4, 2026",
     notes: "Submitted insufficient down payment. Waiting for additional payment proof.",
     bookings: [
@@ -93,7 +90,6 @@ const adminClients: AdminClient[] = [
     clientType: "Online",
     status: "Active",
     totalBookings: 1,
-    totalSpent: "₱6,500",
     lastBooking: "Aug. 28, 2026",
     notes: "Completed christening event. Gallery is already available in the client portal.",
     bookings: [
@@ -116,7 +112,6 @@ const adminClients: AdminClient[] = [
     clientType: "Walk-In",
     status: "Active",
     totalBookings: 1,
-    totalSpent: "₱16,000",
     lastBooking: "Sept. 22, 2026",
     notes: "Walk-in client record created by the admin.",
     bookings: [
@@ -139,7 +134,6 @@ const adminClients: AdminClient[] = [
     clientType: "Walk-In",
     status: "Active",
     totalBookings: 1,
-    totalSpent: "₱4,500",
     lastBooking: "Sept. 30, 2026",
     notes: "Soft copy package only.",
     bookings: [
@@ -217,7 +211,6 @@ function AdminClients() {
         </div>
 
         <div className="dashboard-actions">
-          <button type="button">Add Client</button>
         </div>
       </div>
 
@@ -362,11 +355,6 @@ function AdminClients() {
               <div>
                 <span>Total Bookings</span>
                 <strong>{selectedClient.totalBookings}</strong>
-              </div>
-
-              <div>
-                <span>Total Spent</span>
-                <strong>{selectedClient.totalSpent}</strong>
               </div>
 
               <div>

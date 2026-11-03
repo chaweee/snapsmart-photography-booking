@@ -1,4 +1,6 @@
-import { NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabase";
+import AdminNotificationBell from "./AdminNotificationBell";
 import "./Admin.css";
 
 const adminLinks = [
@@ -31,6 +33,10 @@ const adminLinks = [
     path: "/admin/galleries",
   },
   {
+    label: "Portfolio",
+    path: "/admin/portfolio",
+  },
+  {
     label: "Packages",
     path: "/admin/packages",
   },
@@ -42,13 +48,18 @@ const adminLinks = [
     label: "To-Do List",
     path: "/admin/to-do-list",
   },
-  {
-    label: "Notifications",
-    path: "/admin/notifications",
-  },
 ];
 
 function AdminLayout() {
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      window.alert("Could not log out. Please try again.");
+      return;
+    }
+    navigate("/login");
+  };
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
@@ -75,6 +86,10 @@ function AdminLayout() {
             </NavLink>
           ))}
         </nav>
+        <div className="admin-session-actions">
+          <Link to="/">View website</Link>
+          <button type="button" onClick={handleLogout}>Log out</button>
+        </div>
       </aside>
 
       <div className="admin-content-area">
@@ -84,9 +99,12 @@ function AdminLayout() {
             <h1>Toni Photography Management</h1>
           </div>
 
-          <div className="admin-profile">
-            <span>Admin</span>
-            <div>A</div>
+          <div className="admin-topbar-actions">
+            <AdminNotificationBell />
+            <div className="admin-profile">
+              <span>Admin</span>
+              <div>A</div>
+            </div>
           </div>
         </header>
 

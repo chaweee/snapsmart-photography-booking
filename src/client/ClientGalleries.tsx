@@ -47,6 +47,7 @@ const galleryAlbums = [
 function ClientGalleries() {
   const [activeAlbumId, setActiveAlbumId] = useState("");
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const activeAlbum = galleryAlbums.find((album) => album.id === activeAlbumId);
   const activePhoto = activeAlbum?.photos[activePhotoIndex];
@@ -75,6 +76,37 @@ function ClientGalleries() {
     setActivePhotoIndex((currentIndex) =>
       currentIndex === activeAlbum.photos.length - 1 ? 0 : currentIndex + 1,
     );
+  };
+
+  const downloadPhoto = async (
+    photoUrl: string,
+    albumTitle: string,
+    photoIndex: number,
+  ) => {
+    setIsDownloading(true);
+
+    try {
+      const response = await fetch(photoUrl);
+
+      if (!response.ok) {
+        throw new Error("Unable to download photo");
+      }
+
+      const photoBlob = await response.blob();
+      const blobUrl = URL.createObjectURL(photoBlob);
+      const downloadLink = document.createElement("a");
+
+      downloadLink.href = blobUrl;
+      downloadLink.download = `${albumTitle.replace(/\s+/g, "-").toLowerCase()}-${photoIndex + 1}.jpg`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      downloadLink.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.alert("This photo could not be downloaded. Please try again.");
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -124,9 +156,6 @@ function ClientGalleries() {
                   ))}
                 </div>
 
-                <div className="clean-gallery-actions">
-                  <button type="button">Download Gallery</button>
-                </div>
               </>
             ) : (
               <div className="client-empty-state">
@@ -187,9 +216,19 @@ function ClientGalleries() {
                 Next
               </button>
 
-              <a href={activePhoto} download>
-                Download Photo
-              </a>
+              <button
+                type="button"
+                disabled={isDownloading}
+                onClick={() =>
+                  downloadPhoto(
+                    activePhoto,
+                    activeAlbum.title,
+                    activePhotoIndex,
+                  )
+                }
+              >
+                {isDownloading ? "Downloading..." : "Download Photo"}
+              </button>
             </div>
           </div>
         </div>

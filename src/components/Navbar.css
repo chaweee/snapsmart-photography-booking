@@ -1,4 +1,5 @@
 .site-header {
+  font-family: "Times New Roman", Times, serif;
   position: fixed;
   top: 0;
   right: 0;
@@ -85,6 +86,13 @@
 
 .navbar-actions {
   gap: 18px;
+}
+
+.navbar-role-label {
+  color: #74665b;
+  font-size: 0.7rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .navbar-links a,

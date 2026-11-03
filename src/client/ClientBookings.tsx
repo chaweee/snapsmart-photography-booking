@@ -388,9 +388,8 @@ function ClientBookings() {
                   </li>
 
                   <li>
-                    Toni Photography may use selected photos for portfolio,
-                    promotional, and marketing purposes, both online and
-                    offline.
+                    Selected event photos may be shared in the public portfolio
+                    only if the client gives separate permission.
                   </li>
 
                   <li>

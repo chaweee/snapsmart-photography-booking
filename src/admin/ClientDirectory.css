@@ -1,0 +1,37 @@
+.client-directory { display: grid; gap: 28px; color: #342b25; }
+.client-directory-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+.client-directory-heading p, .client-directory-toolbar > div > p { margin: 0 0 10px; color: #a48169; font-size: .65rem; font-weight: 800; letter-spacing: .14em; }
+.client-directory-heading h2 { margin: 0 0 8px; font: 400 clamp(2.2rem, 4vw, 3.4rem) Georgia, serif; }
+.client-directory-heading h2 span { color: #bb977b; }
+.client-directory-heading > div > div { color: #8b7d73; font-size: .85rem; }
+.client-directory-total { min-width: 180px; display: grid; gap: 4px; border-left: 2px solid #c4a48b; padding: 4px 0 4px 19px; }
+.client-directory-total > span { color: #a18c7b; font-size: .62rem; font-weight: 800; letter-spacing: .1em; }
+.client-directory-total strong { font: 400 2rem Georgia, serif; }
+.client-directory-total small { color: #988b80; font-size: .73rem; }
+.client-directory-panel { overflow: hidden; border: 1px solid #e8ded5; background: #fff; box-shadow: 0 8px 30px rgb(78 55 39 / 4%); }
+.client-directory-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; padding: 26px; }
+.client-directory-toolbar h3 { margin: 0 0 6px; font: 400 1.55rem Georgia, serif; }
+.client-directory-toolbar h3 span { display: inline-block; vertical-align: middle; margin-left: 5px; padding: 4px 9px; border-radius: 20px; color: #876b56; background: #f4ede7; font: 700 .68rem sans-serif; }
+.client-directory-toolbar small { color: #988b80; font-size: .74rem; }
+.client-directory-search { display: flex; align-items: center; gap: 10px; width: min(100%, 280px); border: 1px solid #e9e0d8; padding: 0 13px; color: #a89586; background: #fcfaf8; }
+.client-directory-search:focus-within { outline: 2px solid #a7866d; outline-offset: 1px; }
+.client-directory-search input { width: 100%; min-width: 0; border: 0; outline: 0; padding: 12px 0; color: #342b25; background: transparent; font: inherit; font-size: .8rem; }
+.client-directory-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.client-directory-list-heading, .client-directory-row { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, .8fr); align-items: center; gap: 20px; padding: 14px 26px; }
+.client-directory-list-heading { border-top: 1px solid #f0e8e1; border-bottom: 1px solid #f0e8e1; color: #a18e80; background: #fcfaf8; font-size: .62rem; font-weight: 800; letter-spacing: .1em; }
+.client-directory-row { min-height: 78px; border-bottom: 1px solid #f2ece7; }
+.client-directory-row:last-child { border-bottom: 0; }
+.client-directory-row:hover { background: #fdfaf7; }
+.client-directory-person { display: flex; min-width: 0; align-items: center; gap: 13px; }
+.client-directory-avatar { flex: 0 0 42px; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: #8a6952; background: #f2e7dd; font: 700 .8rem Georgia, serif; }
+.client-directory-person strong, .client-directory-person small { display: block; overflow-wrap: anywhere; }
+.client-directory-person strong { font-size: .84rem; }
+.client-directory-person small { margin-top: 4px; color: #a49589; font-size: .7rem; }
+.client-directory-cell { min-width: 0; overflow-wrap: anywhere; color: #716258; font-size: .8rem; }
+.client-directory-cell small { display: none; }
+.client-directory-panel footer { padding: 15px 26px; border-top: 1px solid #f0e8e1; color: #a09184; font-size: .72rem; }
+.client-directory-state { margin: 0; padding: 38px 26px; border-top: 1px solid #f0e8e1; color: #82746a; font-size: .85rem; }
+.client-directory-state strong { color: #51443b; font: 400 1.2rem Georgia, serif; }
+.client-directory-state p { margin-bottom: 0; }
+.client-directory-state button { border: 0; color: #725641; background: none; cursor: pointer; text-decoration: underline; }
+@media (max-width: 650px) { .client-directory-heading { align-items: start; flex-direction: column; } .client-directory-total { min-width: 0; } .client-directory-toolbar { padding: 20px; } .client-directory-search { width: 100%; } .client-directory-list-heading { display: none; } .client-directory-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 18px 20px; } .client-directory-person { grid-column: 1 / -1; } .client-directory-cell small { display: block; margin-bottom: 4px; color: #a18e80; font-size: .6rem; font-weight: 800; letter-spacing: .08em; } }

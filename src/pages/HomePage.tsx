@@ -7,7 +7,7 @@ interface HomePageProps {
 }
 
 function HomePage({ isLoggedIn }: HomePageProps) {
-  const bookingDestination = "/book";
+  const bookingDestination = isLoggedIn ? "/book" : "/login";
 
   return (
     <div className="home-page">
@@ -346,78 +346,8 @@ function HomePage({ isLoggedIn }: HomePageProps) {
 
             <div className="portal-preview">
               <div className="portal-window">
-                <div className="portal-window-top">
-                  <div className="portal-window-dots">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
-
-                  <span>CLIENT PORTAL</span>
-                </div>
-
-                <div className="portal-body">
-                  <div className="portal-welcome">
-                    <div>
-                      <span>WELCOME BACK</span>
-                      <h3>Your Booking</h3>
-                    </div>
-
-                    <div className="portal-avatar">C</div>
-                  </div>
-
-                  <div className="portal-status-card">
-                    <div className="portal-status-top">
-                      <div>
-                        <span className="portal-mini-label">BOOKING STATUS</span>
-                        <strong>Confirmed</strong>
-                      </div>
-
-                      <span className="status-pill">✓ Confirmed</span>
-                    </div>
-
-                    <div className="portal-event">
-                      <div>
-                        <span>Event</span>
-                        <strong>Wedding Photography</strong>
-                      </div>
-
-                      <div>
-                        <span>Contract</span>
-                        <strong>Available</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="portal-small-grid">
-                    <div className="portal-small-card">
-                      <span>PAYMENT</span>
-                      <strong>Down payment verified</strong>
-
-                      <div className="fake-progress">
-                        <span />
-                      </div>
-                    </div>
-
-                    <div className="portal-small-card">
-                      <span>GALLERY</span>
-                      <strong>Secure access</strong>
-                      <p>Available after final delivery</p>
-                    </div>
-                  </div>
-
-                  <div className="portal-notice">
-                    <div className="portal-notice-icon">S</div>
-
-                    <div>
-                      <strong>SNAPSMART Assistant</strong>
-                      <p>
-                        Need help with your booking? Ask about packages,
-                        payments, or your reservation.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <div className="portal-window-top"><span>CLIENT PORTAL</span></div>
+                <div className="portal-body"><div className="portal-welcome"><div><span>YOUR ACCOUNT</span><h3>Your moments, in one place</h3></div></div><p>Log in to view your bookings and private galleries when they become available.</p></div>
               </div>
             </div>
           </div>
@@ -517,6 +447,10 @@ function HomePage({ isLoggedIn }: HomePageProps) {
 
               <p>Balayan, Batangas</p>
               <p>Philippines</p>
+              <h3>Contact</h3>
+              <a href="https://facebook.com/toniPh0tography" target="_blank" rel="noopener noreferrer">Toni Photography on Facebook ↗</a>
+              <a href="tel:09671341211">0967-134-1211</a>
+              <a href="tel:09555133703">0955-513-3703</a>
             </div>
           </div>
 

@@ -1,0 +1,48 @@
+.team-portal-header { display: flex; justify-content: space-between; align-items: center; min-height: 76px; padding: 0 max(24px, calc((100% - 1180px) / 2)); border-bottom: 1px solid #ded5cd; background: #fffdfb; }
+.team-portal-header > div { display: grid; gap: 3px; }
+.team-portal-header strong { font-size: .85rem; letter-spacing: .16em; }
+.team-portal-header span { color: #927b69; font-size: .65rem; font-weight: 800; letter-spacing: .12em; }
+.team-portal-header a { margin-left: auto; margin-right: 16px; color: #725641; font-size: .8rem; font-weight: 700; text-decoration: none; }
+.team-portal-header a:hover { text-decoration: underline; }
+.team-portal-header button, .team-task-form button { border: 1px solid #29221e; padding: 10px 16px; color: white; background: #29221e; cursor: pointer; font-weight: 700; }
+.team-portal-main { padding-top: 60px; }
+.team-portal-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }
+.team-portal-summary article, .team-panel { border: 1px solid #ded5cd; padding: 24px; background: #fff; }
+.team-portal-summary span { color: #927b69; font-size: .68rem; font-weight: 800; letter-spacing: .1em; }
+.team-portal-summary strong { display: block; margin-top: 10px; font: 400 2rem Georgia, serif; }
+.team-portal-summary p, .team-helper { color: #746a62; font-size: .8rem; line-height: 1.6; }
+.team-portal-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+.team-panel .photographer-section-heading { margin-bottom: 20px; }
+.team-empty { padding: 24px; border: 1px dashed #e3d8ce; color: #81746a; font-size: .85rem; line-height: 1.6; }
+.team-event { border: 1px solid #e5dcd3; padding: 17px; background: #fcfaf8; }
+.team-event span { color: #927b69; font-size: .75rem; font-weight: 700; }
+.team-event h3 { margin: 10px 0; font: 400 1.3rem Georgia, serif; }
+.team-event p { margin: 6px 0 0; color: #746a62; font-size: .8rem; }
+.team-task-form { display: flex; gap: 8px; margin: 16px 0; }
+.team-task-form input { flex: 1; min-width: 0; border: 1px solid #ded5cd; padding: 10px; font: inherit; }
+.team-task-form button:disabled, .team-task-list button:disabled { opacity: .5; cursor: not-allowed; }
+.team-task-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.team-task-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #e5dcd3; padding: 13px; }
+.team-task-list label { display: flex; align-items: start; gap: 10px; min-width: 0; overflow-wrap: anywhere; }
+.team-task-list input { accent-color: #725641; }
+.team-task-list .completed { color: #9b9189; text-decoration: line-through; }
+.team-task-list button { border: 0; color: #8b5d4e; background: transparent; cursor: pointer; }
+.team-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+@media (max-width: 700px) { .team-portal-columns, .team-portal-summary { grid-template-columns: 1fr; } .team-portal-main { padding-top: 35px; } }
+.team-calendar { margin-bottom: 20px; }
+.team-section-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: start; gap: 12px; }
+.team-calendar-controls { display: flex; gap: 8px; }
+.team-calendar-controls button, .team-notification-list button { border: 1px solid #ded5cd; padding: 8px 12px; color: #40352d; background: #fff; cursor: pointer; }
+.team-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.team-calendar-weekday { padding: 8px 0; color: #927b69; font-size: .72rem; text-align: center; }
+.team-calendar-grid button { min-width: 0; min-height: 65px; display: flex; flex-direction: column; align-items: flex-start; gap: 5px; border: 1px solid #eee6de; padding: 8px; color: #40352d; background: #fcfaf8; cursor: pointer; }
+.team-calendar-grid button.has-events { border-color: #b39277; background: #f4e9dd; }
+.team-calendar-grid button.selected { outline: 2px solid #725641; outline-offset: -2px; }
+.team-calendar-grid button small { color: #725641; font-size: .7rem; }
+.team-notifications { margin-top: 20px; }
+.team-notification-list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.team-notification-list li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border: 1px solid #e5dcd3; padding: 15px; }
+.team-notification-list p { margin: 7px 0; color: #746a62; font-size: .8rem; line-height: 1.5; }
+.team-notification-list small { color: #8f8277; }
+.team-unread { margin-left: 10px; border-radius: 99px; padding: 3px 8px; color: #725641; background: #f4e9dd; font-size: .68rem; font-weight: 700; }
+@media (max-width: 500px) { .team-calendar-grid { gap: 3px; } .team-calendar-grid button { min-height: 50px; padding: 4px; } .team-calendar-grid button small { font-size: .58rem; } }

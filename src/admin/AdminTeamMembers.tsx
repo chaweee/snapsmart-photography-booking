@@ -21,6 +21,16 @@ interface TeamMember {
   nextEvent: string;
 }
 
+interface TeamScheduleEvent {
+  id: string;
+  date: string;
+  time: string;
+  event: string;
+  client: string;
+  location: string;
+  status: "Confirmed" | "Pending" | "Completed";
+}
+
 const mockTeamMembers: TeamMember[] = [
   {
     id: "TM-001",
@@ -91,6 +101,53 @@ const roleOptions = [
   "Photographer & Videographer",
 ];
 
+const mockTeamSchedules: Record<string, TeamScheduleEvent[]> = {
+  "TM-001": [
+    {
+      id: "SCH-001",
+      date: "September 18, 2026",
+      time: "9:00 AM – 4:00 PM",
+      event: "Wedding Coverage",
+      client: "Maria Santos",
+      location: "San Jose, Batangas",
+      status: "Confirmed",
+    },
+    {
+      id: "SCH-002",
+      date: "September 26, 2026",
+      time: "2:00 PM – 6:00 PM",
+      event: "Birthday Celebration",
+      client: "Lara Mendoza",
+      location: "Lipa City, Batangas",
+      status: "Pending",
+    },
+  ],
+  "TM-002": [
+    {
+      id: "SCH-003",
+      date: "September 21, 2026",
+      time: "2:00 PM – 6:00 PM",
+      event: "Birthday Celebration",
+      client: "John Reyes",
+      location: "Lipa City, Batangas",
+      status: "Confirmed",
+    },
+  ],
+  "TM-003": [
+    {
+      id: "SCH-004",
+      date: "September 28, 2026",
+      time: "8:00 AM – 5:00 PM",
+      event: "Wedding Coverage",
+      client: "Angela Cruz",
+      location: "Batangas City",
+      status: "Pending",
+    },
+  ],
+  "TM-004": [],
+  "TM-005": [],
+};
+
 function getTeamStatusClass(status: TeamStatus) {
   switch (status) {
     case "Active":
@@ -105,6 +162,7 @@ function getTeamStatusClass(status: TeamStatus) {
 function AdminTeamMembers() {
   const [roleFilter, setRoleFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
   const [selectedMemberId, setSelectedMemberId] = useState(
     mockTeamMembers[0].id,
   );
@@ -128,6 +186,8 @@ function AdminTeamMembers() {
   const selectedMember =
     mockTeamMembers.find((member) => member.id === selectedMemberId) ??
     mockTeamMembers[0];
+
+  const selectedMemberSchedule = mockTeamSchedules[selectedMember.id] ?? [];
 
   const activeMembers = mockTeamMembers.filter(
     (member) => member.status === "Active",
@@ -322,11 +382,85 @@ function AdminTeamMembers() {
           </div>
 
           <div className="team-detail-actions">
-  <button type="button">Edit Member</button>
-  <button type="button">View Schedule</button>
-</div>
+            <button type="button">Edit Member</button>
+            <button type="button" onClick={() => setIsScheduleOpen(true)}>
+              View Schedule
+            </button>
+          </div>
         </aside>
       </section>
+
+      {isScheduleOpen && (
+        <div
+          className="team-schedule-modal-backdrop"
+          role="presentation"
+          onClick={() => setIsScheduleOpen(false)}
+        >
+          <section
+            className="team-schedule-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="team-schedule-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="team-schedule-modal-header">
+              <div>
+                <p>Mock Team Schedule</p>
+                <h2 id="team-schedule-title">{selectedMember.fullName}</h2>
+                <span>{selectedMember.role}</span>
+              </div>
+
+              <button
+                type="button"
+                className="team-schedule-modal-close"
+                aria-label="Close schedule"
+                onClick={() => setIsScheduleOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="team-schedule-modal-summary">
+              <strong>{selectedMemberSchedule.length}</strong>
+              <span>scheduled event{selectedMemberSchedule.length === 1 ? "" : "s"}</span>
+            </div>
+
+            {selectedMemberSchedule.length > 0 ? (
+              <div className="team-schedule-event-list">
+                {selectedMemberSchedule.map((scheduleEvent) => (
+                  <article className="team-schedule-event" key={scheduleEvent.id}>
+                    <div className="team-schedule-event-date">
+                      <strong>{scheduleEvent.date}</strong>
+                      <span>{scheduleEvent.time}</span>
+                    </div>
+
+                    <div className="team-schedule-event-details">
+                      <strong>{scheduleEvent.event}</strong>
+                      <span>{scheduleEvent.client}</span>
+                      <small>{scheduleEvent.location}</small>
+                    </div>
+
+                    <span className={`team-schedule-status ${scheduleEvent.status.toLowerCase()}`}>
+                      {scheduleEvent.status}
+                    </span>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="team-schedule-empty">
+                <strong>No scheduled events</strong>
+                <p>This team member has no mock assignments at the moment.</p>
+              </div>
+            )}
+
+            <div className="team-schedule-modal-footer">
+              <button type="button" onClick={() => setIsScheduleOpen(false)}>
+                Close
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }

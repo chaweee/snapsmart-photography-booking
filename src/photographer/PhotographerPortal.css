@@ -1,0 +1,671 @@
+.photographer-portal-page {
+  min-height: 100vh;
+  color: #29221e;
+  background: #f2eee8;
+}
+
+.photographer-portal-main {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 138px 0 96px;
+}
+
+.photographer-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 30px;
+}
+
+.photographer-hero p,
+.photographer-section-heading p {
+  margin: 0 0 10px;
+  color: #927b69;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.photographer-hero h1 {
+  max-width: 760px;
+  margin: 0;
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3.3rem, 7vw, 6.4rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+}
+
+.photographer-hero > div:first-child > span {
+  display: block;
+  max-width: 690px;
+  margin-top: 20px;
+  color: #6f655e;
+  font-size: 0.98rem;
+  line-height: 1.75;
+}
+
+.photographer-profile-card {
+  min-width: 270px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #ded5cd;
+  padding: 18px;
+  background: #fff;
+}
+
+.photographer-profile-avatar {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+}
+
+.photographer-profile-card strong {
+  display: block;
+  color: #29221e;
+  font-size: 0.9rem;
+}
+
+.photographer-profile-card span {
+  display: block;
+  margin-top: 4px;
+  color: #7b7068;
+  font-size: 0.78rem;
+}
+
+.photographer-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.photographer-summary-grid article {
+  border: 1px solid #ded5cd;
+  padding: 22px;
+  background: #fff;
+}
+
+.photographer-summary-grid span,
+.photographer-info-grid span,
+.photographer-notes-card span,
+.photographer-task-card > span {
+  color: #8b7868;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.photographer-summary-grid strong {
+  display: block;
+  margin-top: 10px;
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.photographer-summary-grid p {
+  margin: 6px 0 0;
+  color: #746a62;
+  font-size: 0.82rem;
+}
+
+.photographer-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 410px;
+  gap: 24px;
+  align-items: start;
+}
+
+.photographer-left-column {
+  min-width: 0;
+}
+
+.photographer-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.photographer-section-heading h2 {
+  margin: 0;
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: -0.04em;
+}
+
+.photographer-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.photographer-filters button {
+  min-height: 36px;
+  border: 1px solid #d8cdc3;
+  padding: 0 13px;
+  color: #5f554f;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 900;
+}
+
+.photographer-filters button:hover,
+.photographer-filters button.active {
+  border-color: #29221e;
+  color: #fff;
+  background: #29221e;
+}
+
+.photographer-assignment-list {
+  display: grid;
+  gap: 14px;
+}
+
+.photographer-assignment-card {
+  width: 100%;
+  border: 1px solid #ded5cd;
+  padding: 20px;
+  text-align: left;
+  background: #fff;
+  cursor: pointer;
+}
+
+.photographer-assignment-card:hover,
+.photographer-assignment-card.active {
+  border-color: #29221e;
+  box-shadow: 0 18px 44px rgba(41, 34, 30, 0.08);
+}
+
+.photographer-assignment-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.photographer-assignment-top > span {
+  color: #927b69;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.photographer-status,
+.availability-status,
+.photographer-role-badge {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 27px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 11px;
+  font-size: 0.62rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.photographer-status.upcoming {
+  color: #24486f;
+  background: #dceafa;
+}
+
+.photographer-status.today {
+  color: #71510e;
+  background: #f7e8bf;
+}
+
+.photographer-status.completed {
+  color: #1f5132;
+  background: #dff2e5;
+}
+
+.photographer-status.rescheduled {
+  color: #6b3f13;
+  background: #f3dcc8;
+}
+
+.photographer-assignment-card h3 {
+  margin: 12px 0 0;
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+}
+
+.photographer-assignment-card p {
+  margin: 8px 0 0;
+  color: #746a62;
+  font-size: 0.86rem;
+}
+
+.photographer-assignment-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid #eee7df;
+  margin-top: 15px;
+  padding-top: 14px;
+}
+
+.photographer-assignment-meta span {
+  color: #4a4039;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.availability-heading {
+  margin-top: 32px;
+}
+
+.photographer-availability-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.photographer-availability-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid #ded5cd;
+  padding: 18px;
+  background: #fff;
+}
+
+.photographer-availability-card span {
+  color: #927b69;
+  font-size: 0.67rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.photographer-availability-card strong {
+  display: block;
+  margin-top: 7px;
+  color: #29221e;
+  font-size: 0.88rem;
+}
+
+.photographer-availability-card p {
+  margin: 7px 0 0;
+  color: #746a62;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.availability-status.available {
+  color: #1f5132;
+  background: #dff2e5;
+}
+
+.availability-status.booked {
+  color: #24486f;
+  background: #dceafa;
+}
+
+.availability-status.unavailable {
+  color: #7e2d2d;
+  background: #f4dada;
+}
+
+.photographer-detail-panel {
+  position: sticky;
+  top: 108px;
+  border: 1px solid #ded5cd;
+  padding: 24px;
+  background: #fff;
+}
+
+.photographer-detail-header {
+  border-bottom: 1px solid #eee7df;
+  padding-bottom: 18px;
+}
+
+.photographer-detail-header span {
+  color: #927b69;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.photographer-detail-header h2 {
+  margin: 8px 0 0;
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+}
+
+.photographer-detail-header p {
+  margin: 6px 0 0;
+  color: #746a62;
+  font-size: 0.86rem;
+}
+
+.photographer-detail-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid #eee7df;
+  padding: 18px 0;
+}
+
+.photographer-role-badge {
+  color: #29221e;
+  background: #eee5dc;
+}
+
+.photographer-info-grid {
+  display: grid;
+  gap: 13px;
+  border-bottom: 1px solid #eee7df;
+  padding: 20px 0;
+}
+
+.photographer-info-grid div {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid #f0e9e2;
+  padding-bottom: 11px;
+}
+
+.photographer-info-grid div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.photographer-info-grid strong {
+  color: #3d352f;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  text-align: right;
+}
+
+.photographer-notes-card,
+.photographer-task-card {
+  border-bottom: 1px solid #eee7df;
+  padding: 20px 0;
+}
+
+.photographer-notes-card p {
+  margin: 10px 0 0;
+  color: #746a62;
+  font-size: 0.83rem;
+  line-height: 1.65;
+}
+
+.photographer-task-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 13px;
+}
+
+.photographer-task-list label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: #4a4039;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.photographer-task-list input {
+  margin-top: 4px;
+  accent-color: #29221e;
+}
+
+.photographer-actions {
+  display: grid;
+  gap: 10px;
+  padding-top: 20px;
+}
+
+.photographer-actions button {
+  min-height: 42px;
+  border: 1px solid #29221e;
+  color: #29221e;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.photographer-actions button:first-child,
+.photographer-actions button:hover {
+  color: #fff;
+  background: #29221e;
+}
+
+@media (max-width: 1100px) {
+  .photographer-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .photographer-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .photographer-detail-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 760px) {
+  .photographer-portal-main {
+    width: min(100% - 34px, 1180px);
+    padding-top: 112px;
+  }
+
+  .photographer-hero,
+  .photographer-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .photographer-profile-card {
+    width: 100%;
+  }
+
+  .photographer-summary-grid,
+  .photographer-availability-list {
+    grid-template-columns: 1fr;
+  }
+
+  .photographer-info-grid div,
+  .photographer-availability-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .photographer-info-grid strong {
+    text-align: left;
+  }
+}
+.photographer-calendar-section {
+  margin-bottom: 34px;
+}
+
+.photographer-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.photographer-calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #6f655e;
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.legend-dot.booked {
+  background: #24486f;
+}
+
+.legend-dot.available {
+  background: #1f5132;
+}
+
+.legend-dot.unavailable {
+  background: #7e2d2d;
+}
+
+.photographer-calendar-card {
+  border: 1px solid #ded5cd;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 18px 44px rgba(41, 34, 30, 0.06);
+}
+
+.photographer-calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  border-bottom: 1px solid #eee7df;
+  padding-bottom: 12px;
+}
+
+.photographer-calendar-weekdays span {
+  color: #927b69;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.photographer-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 14px;
+}
+
+.photographer-calendar-blank {
+  min-height: 88px;
+}
+
+.photographer-calendar-day {
+  min-height: 88px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid #eee7df;
+  padding: 12px;
+  color: #29221e;
+  background: #fbfaf8;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.photographer-calendar-day:hover {
+  border-color: #29221e;
+  box-shadow: 0 12px 28px rgba(41, 34, 30, 0.08);
+  transform: translateY(-2px);
+}
+
+.photographer-calendar-day strong {
+  color: #29221e;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  font-weight: 400;
+}
+
+.photographer-calendar-day span {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 24px;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0 9px;
+  color: #746a62;
+  background: #eee5dc;
+  font-size: 0.62rem;
+  font-weight: 900;
+}
+
+.photographer-calendar-day.booked {
+  border-color: #c4d4e8;
+  background: #f4f8fd;
+}
+
+.photographer-calendar-day.booked span {
+  color: #24486f;
+  background: #dceafa;
+}
+
+.photographer-calendar-day.available {
+  border-color: #cfe5d5;
+  background: #f6fbf7;
+}
+
+.photographer-calendar-day.available span {
+  color: #1f5132;
+  background: #dff2e5;
+}
+
+.photographer-calendar-day.unavailable {
+  border-color: #ebcdcd;
+  background: #fff7f7;
+}
+
+.photographer-calendar-day.unavailable span {
+  color: #7e2d2d;
+  background: #f4dada;
+}
+
+.photographer-calendar-day.has-assignment strong {
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .photographer-calendar-card {
+    overflow-x: auto;
+  }
+
+  .photographer-calendar-weekdays,
+  .photographer-calendar-grid {
+    min-width: 720px;
+  }
+}
+
+@media (max-width: 760px) {
+  .photographer-calendar-legend {
+    width: 100%;
+  }
+}

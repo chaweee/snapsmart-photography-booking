@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import heroImage from "../assets/hero.png";
+import { supabase } from "../lib/supabase";
+
+const capitalizeName = (value: string) => value.replace(/(^|[\s'-])(\p{L})/gu, (_, separator: string, letter: string) => separator + letter.toLocaleUpperCase());
 
 function AuthPage() {
   const location = useLocation();
@@ -12,14 +15,19 @@ function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [signupComplete, setSignupComplete] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
 
   useEffect(() => {
-    setMessage("");
-    setShowPassword(false);
-    setShowConfirmPassword(false);
-  }, [location.pathname]);
+    if (!signupComplete) return;
+    const timer = window.setTimeout(() => navigate("/", { replace: true }), 2000);
+    return () => window.clearTimeout(timer);
+  }, [signupComplete, navigate]);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
@@ -27,27 +35,52 @@ function AuthPage() {
     const email = String(formData.get("email") ?? "");
     const password = String(formData.get("password") ?? "");
 
-    if (isLogin) {
-      if (email === "client@gmail.com" && password === "client") {
-        localStorage.setItem("snapsmartMockUser", "client");
-        navigate("/client/bookings");
-        return;
-      }
-
-      setMessage("Invalid mock account. Use client@gmail.com and password client.");
+    const confirmPassword = String(formData.get("confirmPassword") ?? "");
+    if (!isLogin && !/^\d{11}$/.test(phone)) {
+      setMessage("Phone number must contain exactly 11 digits.");
       return;
     }
-
-    const confirmPassword = String(formData.get("confirmPassword") ?? "");
-
-    if (password !== confirmPassword) {
+    if (!isLogin && (!firstName.trim() || !lastName.trim())) {
+      setMessage("Please enter your first and last name.");
+      return;
+    }
+    if (!isLogin && password !== confirmPassword) {
       setMessage("Passwords do not match.");
       return;
     }
-
-    setMessage(
-      "Sign up UI is ready. Supabase authentication will be connected next.",
-    );
+    setMessage("");
+    setSubmitting(true);
+    try {
+      if (isLogin) {
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        const { data: profile, error: profileError } = await supabase.from("profiles").select("role").eq("id", data.user.id).single();
+        if (profileError || !profile) {
+          setMessage("Your profile could not be loaded. Please contact the administrator.");
+          return;
+        }
+        navigate(profile.role === "admin" ? "/admin" : profile.role === "client" ? "/" : "/photographer");
+      } else {
+        const { data, error } = await supabase.auth.signUp({
+          email, password,
+          options: { data: { full_name: `${firstName.trim()} ${lastName.trim()}`, phone }, emailRedirectTo: `${window.location.origin}/login` },
+        });
+        if (error) throw error;
+        if (data.session) {
+          setSignupComplete(true);
+          setMessage("Signed up successfully! Your account is ready.");
+        } else if (data.user && data.user.identities?.length !== 0) {
+          setSignupComplete(true);
+          setMessage("Signed up successfully! Please check your email to confirm your account before logging in.");
+        } else {
+          setMessage("If this email can be registered, check your inbox for a confirmation link. If it is already registered, try logging in instead.");
+        }
+      }
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -126,7 +159,7 @@ function AuthPage() {
 
             <p>
               {isLogin
-                ? "Access your bookings, agreements, payments, and galleries."
+                ? "Access your bookings, receipts, payments, and galleries."
                 : "Create your client account to start booking photography services."}
             </p>
           </div>
@@ -153,20 +186,41 @@ function AuthPage() {
             </button>
           </div>
 
-          <form className="auth-form" onSubmit={handleSubmit}>
+          {signupComplete ? <div className="form-message" role="status">{message}<br />Redirecting to home...</div> : <form className="auth-form" onSubmit={handleSubmit}>
             {!isLogin && (
               <>
+                <div className="auth-name-row">
                 <div className="field-group">
-                  <label htmlFor="fullName">Full Name</label>
+                  <label htmlFor="firstName">First Name</label>
 
                   <input
-                    id="fullName"
-                    name="fullName"
+                    id="firstName"
+                    name="firstName"
                     type="text"
-                    placeholder="Enter your full name"
-                    autoComplete="name"
+                    placeholder="Enter your first name"
+                    autoComplete="given-name"
+                    autoCapitalize="words"
+                    value={firstName}
+                    onChange={(event) => setFirstName(capitalizeName(event.target.value))}
                     required
                   />
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="lastName">Last Name</label>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    placeholder="Enter your last name"
+                    autoComplete="family-name"
+                    autoCapitalize="words"
+                    value={lastName}
+                    onChange={(event) => setLastName(capitalizeName(event.target.value))}
+                    required
+                  />
+                </div>
+
                 </div>
 
                 <div className="field-group">
@@ -178,6 +232,13 @@ function AuthPage() {
                     type="tel"
                     placeholder="09XX XXX XXXX"
                     autoComplete="tel"
+                    inputMode="numeric"
+                    pattern="[0-9]{11}"
+                    minLength={11}
+                    maxLength={11}
+                    title="Enter exactly 11 digits"
+                    value={phone}
+                    onChange={(event) => setPhone(event.target.value.replace(/\D/g, "").slice(0, 11))}
                     required
                   />
                 </div>
@@ -193,7 +254,6 @@ function AuthPage() {
                 type="email"
                 placeholder="client@gmail.com"
                 autoComplete="email"
-                defaultValue={isLogin ? "client@gmail.com" : ""}
                 required
               />
             </div>
@@ -222,9 +282,8 @@ function AuthPage() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder={isLogin ? "client" : "Enter your password"}
+                  placeholder="Enter your password"
                   autoComplete={isLogin ? "current-password" : "new-password"}
-                  defaultValue={isLogin ? "client" : ""}
                   minLength={isLogin ? 1 : 8}
                   required
                 />
@@ -267,13 +326,6 @@ function AuthPage() {
               </div>
             )}
 
-            {isLogin && (
-              <label className="remember-row">
-                <input type="checkbox" name="remember" />
-                <span>Remember me</span>
-              </label>
-            )}
-
             {!isLogin && (
               <label className="terms-row">
                 <input type="checkbox" name="terms" required />
@@ -308,8 +360,8 @@ function AuthPage() {
               </label>
             )}
 
-            <button className="primary-button" type="submit">
-              {isLogin ? "Log In" : "Create Account"}
+            <button className="primary-button" type="submit" disabled={submitting}>
+              {submitting ? "Please wait..." : isLogin ? "Log In" : "Create Account"}
             </button>
 
             {message && (
@@ -317,14 +369,7 @@ function AuthPage() {
                 {message}
               </div>
             )}
-          </form>
-
-          {isLogin && (
-            <div className="form-message" role="note">
-              Mock Client Account: <strong>client@gmail.com</strong> /{" "}
-              <strong>client</strong>
-            </div>
-          )}
+          </form>}
 
           <div className="switch-prompt">
             <span>
@@ -341,9 +386,6 @@ function AuthPage() {
             </button>
           </div>
 
-          <p className="auth-note">
-            Client access only. Administrative accounts are managed separately.
-          </p>
         </div>
       </section>
     </main>

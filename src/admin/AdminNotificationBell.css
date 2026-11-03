@@ -1,0 +1,22 @@
+.admin-topbar-actions { display: flex; align-items: center; gap: 20px; }
+.admin-bell-container { position: relative; }
+.admin-bell-button { position: relative; display: grid; place-items: center; width: 43px; height: 43px; border: 1px solid #e5dbd1; border-radius: 50%; color: #51463d; background: #fff; cursor: pointer; }
+.admin-bell-button:hover, .admin-bell-button[aria-expanded="true"] { border-color: #a58870; background: #f8f1e9; }
+.admin-bell-badge { position: absolute; top: -4px; right: -4px; min-width: 19px; height: 19px; display: grid; place-items: center; border-radius: 99px; padding: 0 4px; color: #fff; background: #b65d4e; font-size: .62rem; font-weight: 800; }
+.admin-bell-panel { position: absolute; z-index: 100; top: calc(100% + 12px); right: 0; width: min(370px, calc(100vw - 24px)); border: 1px solid #e5dbd1; border-radius: 10px; background: #fffdfb; box-shadow: 0 18px 45px rgb(41 34 30 / 16%); overflow: hidden; }
+.admin-bell-heading { display: flex; justify-content: space-between; align-items: flex-start; padding: 18px; border-bottom: 1px solid #eee6de; }
+.admin-bell-heading strong { display: block; color: #302821; font: 400 1.25rem Georgia, serif; }
+.admin-bell-heading span { display: block; margin-top: 4px; color: #968779; font-size: .72rem; }
+.admin-bell-heading button { border: 0; color: #746a62; background: transparent; cursor: pointer; font-size: 1.4rem; }
+.admin-bell-list { display: grid; max-height: 360px; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+.admin-bell-list li { border-bottom: 1px solid #f0e9e2; padding: 14px 18px; }
+.admin-bell-list li.unread { background: #faf4ed; }
+.admin-bell-item-title { display: flex; justify-content: space-between; gap: 10px; color: #40352d; font-size: .8rem; }
+.admin-bell-item-title span { color: #9c694c; font-size: .65rem; font-weight: 800; }
+.admin-topbar .admin-bell-list p { margin: 7px 0; color: #766a60; font-size: .75rem; font-weight: 400; letter-spacing: normal; line-height: 1.5; text-transform: none; }
+.admin-bell-list time { color: #9a8a7c; font-size: .68rem; }
+.admin-bell-item-actions { display: flex; gap: 14px; margin-top: 9px; }
+.admin-bell-item-actions a, .admin-bell-item-actions button { border: 0; padding: 0; color: #805e48; background: transparent; cursor: pointer; font-size: .72rem; font-weight: 700; text-decoration: underline; }
+.admin-topbar .admin-bell-empty { margin: 0; padding: 22px 18px; color: #897b70; font-size: .8rem; font-weight: 400; letter-spacing: normal; text-transform: none; }
+.admin-bell-view-all { display: block; padding: 15px 18px; color: #725641; font-size: .76rem; font-weight: 800; text-align: center; text-decoration: none; }
+@media (max-width: 500px) { .admin-topbar-actions { gap: 10px; } .admin-bell-panel { right: -60px; } }

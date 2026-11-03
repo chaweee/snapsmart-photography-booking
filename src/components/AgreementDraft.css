@@ -1,0 +1,12 @@
+.agreement-draft { margin: 0 0 18px; border: 1px solid #e5d9cd; background: #fffdfb; }
+.agreement-draft header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 20px; color: #fff; background: #29221e; }
+.agreement-draft header span { color: #d4b99f; font-size: .65rem; font-weight: 800; letter-spacing: .12em; }
+.agreement-draft header h3 { margin: 7px 0 0; font: 400 1.4rem Georgia, serif; }
+.agreement-draft header strong { align-self: start; border: 1px solid #8f7c6d; padding: 5px 8px; color: #ebdccc; font-size: .65rem; }
+.agreement-draft-intro { margin: 18px 20px 0; color: #74685f; font-size: .8rem; line-height: 1.6; }
+.agreement-draft ol { display: grid; gap: 12px; margin: 16px 20px; padding-left: 22px; color: #51463d; font-size: .82rem; line-height: 1.65; }
+.agreement-draft-warning { margin: 18px 20px; border: 1px solid #e7d1b1; padding: 14px; color: #725438; background: #fff8e8; font-size: .78rem; line-height: 1.6; }
+.agreement-draft-warning p { margin: 6px 0 0; }
+.agreement-draft-signature { display: grid; justify-items: start; gap: 8px; border-top: 1px solid #eee6de; padding: 16px 20px; }
+.agreement-draft-signature img { max-width: 180px; max-height: 110px; object-fit: contain; transform: rotate(-90deg); }
+.agreement-draft-signature span { color: #8e7f72; font-size: .72rem; }

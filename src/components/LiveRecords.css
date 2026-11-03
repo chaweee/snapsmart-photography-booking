@@ -1,0 +1,32 @@
+.live-records { display: grid; gap: 20px; color: #342b25; }
+.live-records header p { margin: 0 0 8px; color: #987b65; font-size: .68rem; font-weight: 800; letter-spacing: .14em; }
+.live-records header h2 { margin: 0 0 8px; font: 400 2.4rem Georgia, serif; }
+.live-records header span { color: #807268; font-size: .85rem; }
+.live-records-note, .live-records-empty { padding: 20px; border: 1px solid #e9dfd5; color: #66594f; background: #fcf8f4; line-height: 1.6; }
+.live-records-empty { background: white; }
+.live-records-empty p { margin-bottom: 0; font-size: .85rem; }
+.live-records-table { overflow-x: auto; border: 1px solid #e9dfd5; background: white; }
+.live-records-table table { width: 100%; border-collapse: collapse; font-size: .8rem; text-align: left; }
+.live-records-table th, .live-records-table td { border-bottom: 1px solid #eee7df; padding: 14px; }
+.live-records-table th { color: #927b69; font-size: .7rem; text-transform: uppercase; }
+.unavailable-public { width: min(1100px, calc(100% - 40px)); margin: 130px auto 60px; min-height: 50vh; }
+.assignments-panel { margin-top: 24px; border: 1px solid #e9dfd5; padding: 24px; background: #fff; }
+.assignments-form { display: flex; flex-wrap: wrap; align-items: end; gap: 14px; }
+.assignments-form label { flex: 1 1 220px; display: grid; gap: 7px; color: #66594f; font-size: .8rem; font-weight: 700; }
+.assignments-form select { min-width: 0; width: 100%; padding: 10px; border: 1px solid #ded4ca; background: white; }
+.assignments-form > button { padding: 10px 16px; border: 1px solid #29221e; color: white; background: #29221e; cursor: pointer; }
+.assignments-form button:disabled, .assignments-list button:disabled { opacity: .5; cursor: not-allowed; }
+.assignments-list h3 { font: 400 1.2rem Georgia, serif; }
+.assignments-list p { color: #807268; font-size: .8rem; }
+.assignments-list > div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid #eee7df; font-size: .8rem; }
+.assignment-availability { padding: 18px; border: 1px solid #e9dfd5; background: #fcf9f5; }
+.assignment-availability > strong { color: #483a30; font: 400 1.15rem Georgia, serif; }
+.assignment-availability > p { color: #807268; font-size: .78rem; line-height: 1.6; }
+.assignment-availability-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.assignment-availability-grid > div { display: grid; align-content: start; gap: 6px; padding: 13px; border: 1px solid #eee5dc; background: white; }
+.assignment-availability-grid strong { overflow-wrap: anywhere; font-size: .8rem; }
+.assignment-availability-grid span { color: #998577; font-size: .7rem; text-transform: capitalize; }
+.assignment-availability-grid small { justify-self: start; padding: 4px 8px; border-radius: 20px; font-size: .67rem; font-weight: 700; }
+.assignment-availability-grid small.clear { color: #48684e; background: #eaf2e9; }
+.assignment-availability-grid small.assigned { color: #825d2e; background: #f8eedc; }
+.assignment-availability-grid p { margin: 0; color: #796c61; font-size: .72rem; line-height: 1.5; }

@@ -1,46 +1,76 @@
-import { FormEvent, useMemo, useState } from "react";
-import { formatPeso, photographyPackages } from "../data/packages";
+import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import { formatPeso, type PhotographyPackage } from "../data/packages";
+import { supabase } from "../lib/supabase";
 import "./Admin.css";
 
-const photographers = [
-  "No Preference",
-  "Toni Villacoba",
-  "Photographer A",
-  "Photographer B",
-];
-
-const videographers = [
-  "No Preference",
-  "Videographer A",
-  "Videographer B",
-];
-
 function AdminWalkInBooking() {
-  const [selectedPackageId, setSelectedPackageId] = useState(
-    photographyPackages[0].id,
-  );
+  const [selectedPackageId, setSelectedPackageId] = useState("");
+  const [photographyPackages, setPhotographyPackages] = useState<PhotographyPackage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
   const [eventType, setEventType] = useState("Wedding");
-  const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [message, setMessage] = useState("");
+  const [cash, setCash] = useState("0");
+  const [phone, setPhone] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [locked, setLocked] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const guard = useRef(false);
+  const request = useRef<{ id: string; payload: Record<string, unknown> } | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    void Promise.resolve(supabase.from("packages").select("id,name,subtitle,coverage_type,price,required_down_payment,inclusions,is_popular,requires_photographer,requires_videographer").eq("is_active", true).order("name")).then((packages) => {
+      if (!active) return;
+      if (packages.error) setLoadError(packages.error.message);
+      else {
+        setPhotographyPackages((packages.data ?? []).map((item) => ({ id: item.id, name: item.name, subtitle: item.subtitle, coverageType: item.coverage_type, price: Number(item.price), requiredDownPayment: Number(item.required_down_payment), inclusions: item.inclusions, isPopular: item.is_popular, requiresPhotographer: item.requires_photographer, requiresVideographer: item.requires_videographer })));
+      }
+      setLoading(false);
+    }).catch(() => { if (active) { setLoadError("Unable to load booking data. Please try again."); setLoading(false); } });
+    return () => { active = false; };
+  }, []);
 
   const selectedPackage = useMemo(
     () =>
       photographyPackages.find(
         (item) => item.id === selectedPackageId,
       ) ?? photographyPackages[0],
-    [selectedPackageId],
+    [selectedPackageId, photographyPackages],
   );
 
-  const downPayment = Math.ceil(selectedPackage.price * 0.3);
-  const remainingBalance = selectedPackage.price - downPayment;
+  const downPayment = selectedPackage?.requiredDownPayment ?? 0;
+  const remainingBalance = (selectedPackage?.price ?? 0) - downPayment;
+  const cashIsValid = /^\d+(?:\.\d{1,2})?$/.test(cash) && Number(cash) <= (selectedPackage?.price ?? 0);
+  const cashAmount = cashIsValid ? Number(cash) : 0;
+  const downPaymentRemaining = Math.max(Math.round(downPayment * 100) - Math.round(cashAmount * 100), 0) / 100;
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    setMessage(
-      "Walk-in booking recorded successfully. Once connected to Supabase, this will create a confirmed booking and verified payment record.",
-    );
+    if (busy || saved || guard.current) return;
+    const form = new FormData(event.currentTarget);
+    if (!request.current) {
+      const amountText = String(form.get("amountReceived") ?? "").trim();
+      const amount = Number(amountText);
+      if (!/^\d+(?:\.\d{1,2})?$/.test(amountText) || !Number.isFinite(amount) || amount > selectedPackage.price) { setMessage("Enter the actual cash received using up to two decimal places, without commas."); return; }
+      request.current = { id: crypto.randomUUID(), payload: {
+        package_id: selectedPackage.id, client_name: String(form.get("clientName") ?? "").trim(), email: String(form.get("email") ?? "").trim(), phone: String(form.get("phone") ?? "").trim(), address: String(form.get("address") ?? "").trim(), event_type: eventType, other_event_type: String(form.get("otherEventType") ?? "").trim(), event_date: String(form.get("eventDate") ?? ""), start_time: String(form.get("startTime") ?? ""), event_location: String(form.get("eventLocation") ?? "").trim(), church_location: String(form.get("churchLocation") ?? "").trim(), theme_motif: String(form.get("themeMotif") ?? "").trim(), bride_name: String(form.get("brideName") ?? "").trim(), groom_name: String(form.get("groomName") ?? "").trim(), notes: String(form.get("notes") ?? "").trim(), cash_received: amount, cash_confirmed: form.get("paymentVerified") === "on", public_gallery_permission: form.get("publicGalleryPermission") === "on",
+      } };
+      setLocked(true);
+    }
+    guard.current = true; setBusy(true); setMessage("");
+    try {
+      const { data, error } = await supabase.rpc("create_walk_in_booking", { p_id: request.current.id, p_form: request.current.payload });
+      if (error) throw new Error(error.message);
+      if (!data) throw new Error("The booking could not be confirmed saved.");
+      setSaved(true);
+      setMessage("Walk-in booking saved. The client can access it after signing up and verifying the same email address.");
+    } catch (failure) { setMessage(`${failure instanceof Error ? failure.message : "Could not save the booking."} Retry uses the same request; check Bookings before starting another.`); }
+    finally { guard.current = false; setBusy(false); }
   };
+
+  if (loading || loadError || !selectedPackage) return <div className="admin-walkin-page"><h2>Create walk-in booking</h2><p role={loadError ? "alert" : "status"}>{loading ? "Loading packages..." : loadError ? `Could not load booking data: ${loadError}` : "No active packages are available yet."}</p></div>;
 
   return (
     <div className="admin-walkin-page">
@@ -51,13 +81,14 @@ function AdminWalkInBooking() {
         </div>
 
         <div className="dashboard-actions">
-          <button type="button">View Bookings</button>
-          <button type="button">Open Calendar</button>
+          <Link to="/admin/bookings">View Bookings</Link>
+          <Link to="/admin/calendar">Open Calendar</Link>
         </div>
       </section>
 
       <section className="walkin-layout">
         <form className="walkin-form" onSubmit={handleSubmit}>
+          <fieldset className="walkin-form-fields" disabled={locked || busy || saved}>
           <section className="admin-panel">
             <div className="admin-panel-heading">
               <div>
@@ -83,6 +114,10 @@ function AdminWalkInBooking() {
                   name="phone"
                   type="tel"
                   placeholder="09XX XXX XXXX"
+                  inputMode="numeric"
+                  maxLength={11}
+                  value={phone}
+                  onChange={(event) => setPhone(event.target.value.replace(/\D/g, "").slice(0, 11))}
                   required
                 />
               </label>
@@ -93,6 +128,7 @@ function AdminWalkInBooking() {
                   name="email"
                   type="email"
                   placeholder="client@example.com"
+                  required
                 />
               </label>
 
@@ -121,7 +157,7 @@ function AdminWalkInBooking() {
                   key={item.id}
                   type="button"
                   className={
-                    selectedPackageId === item.id
+                    selectedPackage.id === item.id
                       ? "walkin-package-card active"
                       : "walkin-package-card"
                   }
@@ -157,9 +193,11 @@ function AdminWalkInBooking() {
                   <option>Birthday</option>
                   <option>Debut</option>
                   <option>Christening</option>
-                  <option>Special Event</option>
+                  <option value="Special Event">Other Event</option>
                 </select>
               </label>
+
+              {eventType === "Special Event" && <label className="walkin-field"><span>What kind of event?</span><input name="otherEventType" type="text" maxLength={150} required /></label>}
 
               <label className="walkin-field">
                 <span>Event Date</span>
@@ -169,11 +207,6 @@ function AdminWalkInBooking() {
               <label className="walkin-field">
                 <span>Start Time</span>
                 <input name="startTime" type="time" required />
-              </label>
-
-              <label className="walkin-field">
-                <span>End Time</span>
-                <input name="endTime" type="time" />
               </label>
 
               <label className="walkin-field full">
@@ -209,8 +242,9 @@ function AdminWalkInBooking() {
                 </>
               )}
 
+              {eventType === "Wedding" && <label className="walkin-field full"><span>Church Location</span><input name="churchLocation" type="text" maxLength={500} placeholder="Church name and complete location" required /></label>}
               <label className="walkin-field full">
-                <span>Event Location</span>
+                <span>{eventType === "Wedding" ? "Reception" : "Event Location"}</span>
                 <input
                   name="eventLocation"
                   type="text"
@@ -220,7 +254,7 @@ function AdminWalkInBooking() {
               </label>
 
               <label className="walkin-field full">
-                <span>Additional Notes</span>
+                <span>Additional Notes (optional)</span>
                 <textarea
                   name="notes"
                   rows={4}
@@ -234,46 +268,6 @@ function AdminWalkInBooking() {
             <div className="admin-panel-heading">
               <div>
                 <p>Step 4</p>
-                <h3>Assign preferred team</h3>
-              </div>
-            </div>
-
-            <div className="walkin-field-grid">
-              {selectedPackage.requiresPhotographer && (
-                <label className="walkin-field">
-                  <span>Photographer</span>
-
-                  <select name="photographer" required>
-                    {photographers.map((name) => (
-                      <option key={name}>{name}</option>
-                    ))}
-                  </select>
-                </label>
-              )}
-
-              {selectedPackage.requiresVideographer && (
-                <label className="walkin-field">
-                  <span>Videographer</span>
-
-                  <select name="videographer" required>
-                    {videographers.map((name) => (
-                      <option key={name}>{name}</option>
-                    ))}
-                  </select>
-                </label>
-              )}
-            </div>
-
-            <p className="walkin-helper">
-              Later, this will check the selected team member’s availability
-              before confirming the booking.
-            </p>
-          </section>
-
-          <section className="admin-panel">
-            <div className="admin-panel-heading">
-              <div>
-                <p>Step 5</p>
                 <h3>Payment collection</h3>
               </div>
             </div>
@@ -299,111 +293,61 @@ function AdminWalkInBooking() {
               <label className="walkin-field">
                 <span>Payment Method</span>
 
-                <select
-                  name="paymentMethod"
-                  value={paymentMethod}
-                  onChange={(event) => setPaymentMethod(event.target.value)}
-                  required
-                >
-                  <option>Cash</option>
-                  <option>GCash</option>
-                  <option>Bank Transfer</option>
-                </select>
+                <input name="paymentMethod" value="Cash" readOnly />
               </label>
 
               <label className="walkin-field">
                 <span>Amount Received</span>
                 <input
                   name="amountReceived"
-                  type="number"
-                  min="0"
-                  placeholder={`${downPayment}`}
+                  type="text" inputMode="decimal" pattern="[0-9]+([.][0-9]{1,2})?"
+                  value={cash} onChange={(event) => setCash(event.target.value)}
+                  aria-describedby="walkin-cash-review"
                   required
                 />
               </label>
             </div>
 
-            {paymentMethod === "Cash" && (
-              <div className="walkin-payment-note">
-                <strong>Cash Payment</strong>
-                <p>
-                  Admin receives the cash payment and marks the down payment as
-                  verified immediately.
-                </p>
-              </div>
-            )}
+            <div className="walkin-cash-review" id="walkin-cash-review" aria-live="polite"><div><span>Cash to record</span><strong>{cashIsValid ? formatPeso(cashAmount) : "Enter a valid amount"}</strong></div><div><span>Down payment still needed</span><strong>{cashIsValid ? formatPeso(downPaymentRemaining) : "—"}</strong></div></div>
 
-            {paymentMethod === "GCash" && (
-              <div className="walkin-qr-box">
-                <div className="walkin-qr-placeholder">GCash QR</div>
-
-                <div>
-                  <strong>GCash Payment</strong>
-                  <p>
-                    Client scans the displayed QR code. Since this is a walk-in
-                    transaction, admin can verify the payment immediately after
-                    checking the confirmation screen.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {paymentMethod === "Bank Transfer" && (
-              <div className="walkin-qr-box">
-                <div className="walkin-qr-placeholder">BANK</div>
-
-                <div>
-                  <strong>Bank Transfer</strong>
-                  <p>
-                    Admin provides the bank account or QR details. No upload is
-                    required because the admin verifies the transaction on-site.
-                  </p>
-                </div>
-              </div>
-            )}
+            <div className="walkin-payment-note">
+              <strong>Cash payment</strong>
+              <p>Enter only cash actually received. The booking is confirmed once the required down payment is met; otherwise it remains pending or insufficient.</p>
+            </div>
 
             <label className="walkin-check">
-              <input name="paymentVerified" type="checkbox" required />
+              <input name="paymentVerified" type="checkbox" required={Number(cash) > 0} />
 
               <span>
-                I confirm that the walk-in down payment has been received and
-                verified.
+                I confirm that the cash amount entered above has actually been received.
               </span>
             </label>
+
           </section>
 
           <section className="admin-panel">
             <div className="admin-panel-heading">
               <div>
-                <p>Step 6</p>
-                <h3>Agreement confirmation</h3>
+                <p>Step 5</p>
+                <h3>Photo privacy</h3>
               </div>
             </div>
 
-            <label className="walkin-check">
-              <input name="agreement" type="checkbox" required />
-
-              <span>
-                Client has reviewed and agreed to the booking terms, payment
-                requirements, cancellation policy, and privacy terms.
-              </span>
-            </label>
-
-            <div className="walkin-signature-box">
-              <strong>Client E-Signature Area</strong>
-              <p>
-                Drawable signature pad will be added later. For now, this is the
-                placeholder for the client’s walk-in agreement signature.
-              </p>
+            <div className="walkin-payment-note">
+              <strong>Photo privacy</strong>
+              <p>Event photos are private by default. The client may optionally allow selected photos for portfolio, promotion, and marketing, online and offline. Permission does not automatically publish photos.</p>
+              <label className="walkin-check"><input name="publicGalleryPermission" type="checkbox" /><span>Client permits selected event photos to be used for portfolio, promotion, and marketing, online and offline.</span></label>
             </div>
+
           </section>
 
+          </fieldset>
+
           <div className="walkin-submit-area">
-            <button type="submit">Create Confirmed Walk-In Booking</button>
+            <button type="submit" disabled={busy || saved}>{busy ? "Saving..." : saved ? "Booking saved" : locked ? "Retry submission" : "Save walk-in booking"}</button>
 
             <p>
-              This walk-in booking will be treated as confirmed once the admin
-              records and verifies the down payment.
+              The client must sign up with this email and verify it to access the booking. Confirm the email carefully before saving.
             </p>
 
             {message && <div className="booking-message">{message}</div>}
@@ -434,12 +378,12 @@ function AdminWalkInBooking() {
 
             <div>
               <span>Payment Method</span>
-              <strong>{paymentMethod}</strong>
+              <strong>Cash</strong>
             </div>
 
             <div>
               <span>Initial Status</span>
-              <strong>Confirmed</strong>
+              <strong>Not saved</strong>
             </div>
           </div>
 

@@ -327,6 +327,60 @@
   accent-color: #29221e;
 }
 
+.booking-field .booking-time-note { display: flex; align-items: flex-start; gap: 7px; margin-top: 3px; color: #857365; font-size: .73rem; font-weight: 400; line-height: 1.5; }
+.booking-field .booking-time-note span { color: #a47d60; font-size: .9rem; line-height: 1.15; }
+
+.gallery-privacy-choice {
+  margin-top: 18px;
+  border: 1px solid #e8ded3;
+  padding: 20px;
+  background: #fbf8f4;
+}
+
+.gallery-privacy-heading > span {
+  color: #927b69;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.gallery-privacy-heading h3 {
+  margin: 7px 0;
+  color: #29221e;
+  font-family: Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+.gallery-privacy-heading p {
+  margin: 0;
+  color: #6e6258;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.gallery-consent-option {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  border: 1px solid #e8ded3;
+  padding: 15px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.gallery-consent-option input {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+  margin-top: 2px;
+  accent-color: #29221e;
+}
+
+.gallery-consent-option span { display: grid; gap: 5px; }
+.gallery-consent-option strong { color: #40352d; font-size: 0.82rem; }
+.gallery-consent-option small { color: #786c61; font-size: 0.75rem; line-height: 1.5; }
+
 .client-signature-box {
   border: 1px solid #ded8d1;
   margin-top: 18px;
@@ -548,6 +602,30 @@
 /* =========================================================
    CUSTOM FILE UPLOAD
    ========================================================= */
+
+.proof-upload-section { margin-top: 24px; }
+.proof-upload-heading { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.proof-upload-heading > div > span { color: #927b69; font-size: .65rem; font-weight: 800; letter-spacing: .12em; }
+.proof-upload-heading h3 { margin: 7px 0 5px; color: #29221e; font: 400 1.35rem Georgia, serif; }
+.proof-upload-heading p { margin: 0; color: #81746a; font-size: .78rem; line-height: 1.5; }
+.proof-upload-required { border-radius: 99px; padding: 5px 10px; color: #806b58; background: #f1e8df; font-size: .67rem; font-weight: 800; }
+.proof-upload-card { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; border: 1px dashed #c8b5a5; border-radius: 8px; padding: 20px; background: #fcf9f5; transition: border-color 150ms ease, background 150ms ease; }
+.proof-upload-card:hover, .proof-upload-card:focus-within { border-color: #92745d; background: #f8f1ea; }
+.proof-upload-card.has-file { border-style: solid; border-color: #b7c8af; background: #f8fbf6; }
+.proof-upload-card.has-error { border-color: #c7887c; background: #fff8f6; }
+.proof-upload-input { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+.proof-upload-input:focus-visible ~ .proof-upload-actions .proof-upload-choose { outline: 2px solid #725641; outline-offset: 3px; }
+.proof-upload-icon { flex: 0 0 48px; height: 48px; display: grid; place-items: center; border-radius: 12px; color: #80634f; background: #eee3d8; }
+.proof-upload-copy { flex: 1 1 180px; min-width: 0; }
+.proof-upload-copy strong { display: block; overflow-wrap: anywhere; color: #342b25; font-size: .85rem; }
+.proof-upload-copy p { margin: 6px 0 0; color: #8b7e73; font-size: .74rem; line-height: 1.5; }
+.proof-upload-actions { display: flex; align-items: center; gap: 12px; }
+.proof-upload-choose { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; border: 1px solid #29221e; border-radius: 5px; padding: 0 15px; color: white; background: #29221e; cursor: pointer; font-size: .73rem; font-weight: 800; white-space: nowrap; }
+.proof-upload-choose:hover { background: #44372e; }
+.proof-upload-actions button { border: 0; padding: 6px 0; color: #8a6f5d; background: transparent; cursor: pointer; font-size: .72rem; font-weight: 700; text-decoration: underline; }
+.proof-upload-feedback { margin: 9px 0 0; color: #8b7e73; font-size: .72rem; line-height: 1.5; }
+.proof-upload-feedback.error { color: #a34d42; }
+@media (max-width: 540px) { .proof-upload-card { padding: 16px; } .proof-upload-actions { width: 100%; } .proof-upload-choose { flex: 1; } }
 
 .file-upload-box {
   min-height: 118px;
@@ -778,4 +856,27 @@
   .file-upload-button {
     width: 100%;
   }
+}
+
+.booking-agreement-terms { margin-top: 18px; }
+.booking-agreement-terms summary { padding: 14px; border: 1px solid #ded8d1; background: #fbfaf8; color: #51463d; cursor: pointer; font-weight: 700; }
+.booking-agreement-terms .agreement-draft { margin-top: 12px; }
+.client-signature-box + .agreement-box { margin-top: 18px; }
+
+.booking-payment-method {
+  margin-bottom: 16px;
+}
+
+.test-booking-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.booking-payment-qr {
+  display: block;
+  width: min(180px, 100%);
+  height: auto;
+  object-fit: contain;
 }

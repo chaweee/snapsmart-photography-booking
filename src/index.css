@@ -1,3 +1,10 @@
+:root {
+  --ink: #29221e;
+  --paper: #f8f4ef;
+  --accent: #98755b;
+  --line: #e5dbd1;
+}
+
 #root {
   font-size: 17.5px;
   min-height: 100vh;
@@ -12,6 +19,7 @@
   overflow-x: hidden;
   color: var(--ink);
   background: var(--paper);
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .home-shell {
@@ -287,10 +295,10 @@
   background:
     radial-gradient(
       circle at 7% 30%,
-      rgba(176, 154, 135, 0.13),
+      rgba(176, 143, 116, 0.25),
       transparent 32%
     ),
-    var(--paper);
+    linear-gradient(135deg, #f8f2eb 0%, #ede2d6 58%, #f9f5ef 100%);
 }
 
 .hero-layout {
@@ -465,7 +473,7 @@
   border-top: 1px solid #ded8d1;
   border-bottom: 1px solid #ded8d1;
   padding: 21px 0;
-  background: #f5f1ec;
+  background: linear-gradient(100deg, #e9d9c9, #f4eae0 50%, #e6d4c3);
 }
 
 .experience-strip-inner {
@@ -490,7 +498,7 @@
    ========================================================= */
 
 .packages-section {
-  background: #fff;
+  background: radial-gradient(circle at 90% 10%, #ead7c4 0%, transparent 38%), linear-gradient(135deg, #f9f2ea, #efe1d3);
 }
 
 .section-heading-split {
@@ -538,7 +546,7 @@
   justify-content: space-between;
   border-right: 1px solid var(--line);
   padding: 35px;
-  background: #fff;
+  background: linear-gradient(150deg, #fffaf5, #f3e7db);
   transition:
     transform 180ms ease,
     background 180ms ease;
@@ -637,7 +645,7 @@
    ========================================================= */
 
 .booking-process {
-  background: #f2eee8;
+  background: linear-gradient(120deg, #e7d5c4 0%, #f4eae0 55%, #e9d9ca 100%);
 }
 
 .centered-heading {
@@ -669,7 +677,14 @@
 }
 
 .process-number {
-  color: #9c8b7e;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #b28c70;
+  border-radius: 50%;
+  color: #70503b;
+  background: #f9eee4;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 0.72rem;
   font-style: italic;
@@ -707,7 +722,7 @@
    ========================================================= */
 
 .client-experience-section {
-  background: #fff;
+  background: radial-gradient(circle at 78% 24%, #e4cdb7 0%, transparent 42%), linear-gradient(135deg, #f8efe6 0%, #ead8c8 100%);
 }
 
 .client-experience-layout {
@@ -756,7 +771,14 @@
 }
 
 .experience-feature > span {
-  color: #a28f80;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #b28c70;
+  border-radius: 50%;
+  color: #70503b;
+  background: #f9eee4;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 0.7rem;
   font-style: italic;
@@ -779,12 +801,12 @@
 
 .portal-preview {
   padding: 45px;
-  background: #e9e2da;
+  background: linear-gradient(145deg, #d5bba3, #eee0d3 55%, #cdb19a);
 }
 
 .portal-window {
   overflow: hidden;
-  background: #faf9f7;
+  background: linear-gradient(135deg, #f8ece0 0%, #e7cdb7 100%);
   box-shadow: 0 35px 90px rgba(37, 29, 24, 0.14);
 }
 
@@ -796,7 +818,7 @@
   border-bottom: 1px solid #e1dcd6;
   padding: 0 19px;
   color: #8f857d;
-  background: #fff;
+  background: linear-gradient(100deg, #f0ded0, #e6cbb5);
   font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.13em;
@@ -991,7 +1013,7 @@
    ========================================================= */
 
 .about-section {
-  background: #f2eee8;
+  background: linear-gradient(120deg, #e4d0bd, #f2e7dc 60%, #e9d6c5);
 }
 
 .about-layout {
@@ -1038,7 +1060,7 @@
 .home-cta {
   padding: 78px 0;
   color: #fff;
-  background: #29221e;
+  background: linear-gradient(120deg, #29211d, #564034 60%, #34271f);
 }
 
 .cta-inner {
@@ -1067,7 +1089,7 @@
 
 .site-footer {
   padding: 70px 0 25px;
-  background: #171412;
+  background: linear-gradient(130deg, #211a16, #34261f);
   color: #fff;
 }
 
