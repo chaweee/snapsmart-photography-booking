@@ -1,30 +1,32 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
-import AdminDashboard from "./admin/LiveDashboard";
-import AdminGalleries from "./admin/PrivateGalleries";
-import AdminLayout from "./admin/AdminLayout";
-import AdminPackages from "./admin/AdminPackages";
-import LiveTodoList from "./admin/LiveTodoList";
-import PaymentProofs from "./admin/PaymentProofs";
-import AdminWalkInBooking from "./admin/AdminWalkInBooking";
-import BookingTeamAssignments from "./admin/BookingTeamAssignments";
-import ClientGalleries from "./client/PrivateGalleries";
-import ClientLayout from "./client/ClientLayout";
-import LiveRecords from "./components/LiveRecords";
-import FeatureUnavailable from "./components/FeatureUnavailable";
-import BookingViews from "./components/BookingViews";
-import NotificationsPage from "./components/NotificationsPage";
-import TeamPortal from "./photographer/TeamPortal";
+import { lazy, Suspense } from "react";
 import ScrollToTop from "./components/ScrollToTop";
-import AuthPage from "./pages/AuthPage";
-import PortfolioManager from "./admin/PortfolioManager";
-import TeamDirectory from "./admin/TeamDirectory";
-import PublicPortfolio from "./pages/PublicPortfolio";
-import BookingPage from "./pages/BookingPage";
 import HomePage from "./pages/HomePage";
 import ChatAssistant from "./components/ChatAssistant";
 import { useAuth } from "./auth/authContext";
 import type { ReactNode } from "react";
+
+const AdminDashboard = lazy(() => import("./admin/LiveDashboard"));
+const AdminGalleries = lazy(() => import("./admin/PrivateGalleries"));
+const AdminLayout = lazy(() => import("./admin/AdminLayout"));
+const AdminPackages = lazy(() => import("./admin/AdminPackages"));
+const LiveTodoList = lazy(() => import("./admin/LiveTodoList"));
+const PaymentProofs = lazy(() => import("./admin/PaymentProofs"));
+const AdminWalkInBooking = lazy(() => import("./admin/AdminWalkInBooking"));
+const BookingTeamAssignments = lazy(() => import("./admin/BookingTeamAssignments"));
+const ClientGalleries = lazy(() => import("./client/PrivateGalleries"));
+const ClientLayout = lazy(() => import("./client/ClientLayout"));
+const LiveRecords = lazy(() => import("./components/LiveRecords"));
+const FeatureUnavailable = lazy(() => import("./components/FeatureUnavailable"));
+const BookingViews = lazy(() => import("./components/BookingViews"));
+const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
+const TeamPortal = lazy(() => import("./photographer/TeamPortal"));
+const AuthPage = lazy(() => import("./pages/AuthPage"));
+const PortfolioManager = lazy(() => import("./admin/PortfolioManager"));
+const TeamDirectory = lazy(() => import("./admin/TeamDirectory"));
+const PublicPortfolio = lazy(() => import("./pages/PublicPortfolio"));
+const BookingPage = lazy(() => import("./pages/BookingPage"));
 
 function ProtectedRoute({ children, roles }: { children: ReactNode; roles: string[] }) {
   const { session, role, loading } = useAuth();
@@ -47,7 +49,7 @@ function App() {
     <>
       <ScrollToTop />
 
-      <Routes>
+      <Suspense fallback={<p role="status">Loading page...</p>}><Routes>
         <Route path="/" element={<HomePage isLoggedIn={!!session} />} />
 
         <Route
@@ -87,7 +89,7 @@ function App() {
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      </Routes></Suspense>
 
       <ChatAssistant />
 
