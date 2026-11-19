@@ -3,11 +3,6 @@ import { supabase } from "../lib/supabase";
 import "./ChatAssistant.css";
 
 type Message = { role: "user" | "assistant"; content: string };
-const destinations = [
-  ["Packages", "/#packages"], ["How it works", "/#how-it-works"], ["Portfolio", "/portfolio"],
-  ["Book now", "/book"], ["My bookings", "/client/bookings"], ["My galleries", "/client/galleries"],
-  ["Log in", "/login"], ["Contact", "/#contact"],
-];
 
 export default function ChatAssistant() {
   const [open, setOpen] = useState(false);
@@ -54,16 +49,16 @@ export default function ChatAssistant() {
 
   return <div className="chat-widget">
     {open && <section className="chat-panel" aria-label="SNAPSMART assistant">
-      <header><div><strong>SNAPSMART Assistant</strong><small>AI-powered · General inquiries</small></div><button type="button" onClick={() => setOpen(false)} aria-label="Close chat">×</button></header>
+      <header><div><strong>SNAPSMART Assistant</strong><small>AI-powered · SnapSmart inquiries</small></div><button type="button" onClick={() => setOpen(false)} aria-label="Close chat">×</button></header>
       <div className="chat-messages" ref={messagesRef} aria-live="polite">
         <p className="chat-bubble assistant">Hi! Ask me about our packages, booking process, or how to use SNAPSMART. Please don't share passwords or verification codes.</p>
         {messages.map((message, index) => <p className={`chat-bubble ${message.role}`} key={index}>{message.role === "assistant" ? message.content.replace(/\*\*/g, "") : message.content}</p>)}
         {busy && <p className="chat-bubble assistant">Thinking…</p>}
         {error && <p className="chat-error" role="alert">{error}</p>}
       </div>
-      <nav className="chat-links" aria-label="Quick navigation">{destinations.map(([label, href]) => <a key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}</nav>
+      <nav className="chat-links" aria-label="Quick navigation">{[["Packages", "/#packages"], ["How it works", "/#how-it-works"], ["Portfolio", "/portfolio"], ["Book now", "/book"], ["Contact", "/#contact"]].map(([label, href]) => <a key={href} href={href} onClick={() => setOpen(false)}>{label}</a>)}</nav>
       <form onSubmit={send}><textarea ref={inputRef} rows={1} value={input} onChange={(event) => setInput(event.target.value)} onKeyDown={handleKeyDown} maxLength={1000} placeholder="Ask a question..." aria-label="Your message" disabled={busy} /><button type="submit" disabled={busy || !input.trim()}>Send</button></form>
-      <small className="chat-disclaimer">AI can make mistakes. Confirm important details with the studio.</small>
+      <small className="chat-disclaimer">For other questions, please contact the studio.</small>
     </section>}
     <button type="button" className="chat-toggle" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={open ? "Close chat" : "Open chat assistant"}>{open ? "×" : "✦"}</button>
   </div>;

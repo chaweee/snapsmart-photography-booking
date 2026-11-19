@@ -177,11 +177,11 @@ function HomePage({ isLoggedIn }: HomePageProps) {
                 <span className="process-number">03</span>
                 <div className="process-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13 4H5v16h14v-7M8 9h5M8 13h4M8 17h3"/><path d="m14 14 6-6-2-2-6 6-.5 2.5L14 14Z"/></svg></div>
 
-                <h3>Review &amp; E-Sign</h3>
+                <h3>Review Your Details</h3>
 
                 <p>
-                  Review the booking agreement, confirm your information, and
-                  provide your electronic signature.
+                  Check your package and event information before submitting
+                  your booking request.
                 </p>
               </article>
 
@@ -204,8 +204,8 @@ function HomePage({ isLoggedIn }: HomePageProps) {
                 <h3>You're Confirmed</h3>
 
                 <p>
-                  Once payment is verified, your booking is confirmed and your
-                  contract becomes available.
+                  Once payment is verified, check your booking status in your
+                  client account.
                 </p>
               </article>
             </div>
