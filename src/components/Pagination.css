@@ -1,0 +1,12 @@
+.pagination { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 18px; }
+.pagination-summary { margin: 0; color: #89786c; font-size: .75rem; font-weight: 700; }
+.pagination-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.pagination-controls button { min-width: 38px; min-height: 38px; border: 1px solid #dfd4ca; padding: 0 12px; color: #302821; background: #fff; cursor: pointer; font: inherit; font-size: .75rem; font-weight: 700; }
+.pagination-controls button:hover:not(:disabled) { border-color: #a58870; background: #f8f1e9; }
+.pagination-controls button.active { border-color: #302821; color: #fff; background: #302821; }
+.pagination-controls button:disabled { opacity: .45; cursor: not-allowed; }
+.pagination-gap { padding: 0 4px; color: #89786c; }
+@media print { .pagination { display: none; } }
+@media (max-width: 580px) { .pagination { justify-content: center; } .pagination-summary { width: 100%; text-align: center; } }
+/* Admin/client lists: a little breathing room inside panels. */
+.pagination.admin-list-pagination { padding: 0 2px; }

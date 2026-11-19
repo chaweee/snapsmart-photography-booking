@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import heroImage from "../assets/hero.png";
 import { supabase } from "../lib/supabase";
+import { EMAIL_ERROR, NAME_PART_MAX_LENGTH, emailInputProps, filterEmailInput, findNameError, isValidEmail, nameInputProps, stripNameChars } from "../lib/validation";
 
 const capitalizeName = (value: string) => value.replace(/(^|[\s'-])(\p{L})/gu, (_, separator: string, letter: string) => separator + letter.toLocaleUpperCase());
 
@@ -29,16 +30,25 @@ function AuthPage() {
 
     const formData = new FormData(event.currentTarget);
 
-    const email = String(formData.get("email") ?? "");
+    const email = String(formData.get("email") ?? "").trim();
     const password = String(formData.get("password") ?? "");
 
     const confirmPassword = String(formData.get("confirmPassword") ?? "");
+    if (!isValidEmail(email)) {
+      setMessage(EMAIL_ERROR);
+      return;
+    }
     if (!isLogin && !/^\d{11}$/.test(phone)) {
       setMessage("Phone number must contain exactly 11 digits.");
       return;
     }
     if (!isLogin && (!firstName.trim() || !lastName.trim())) {
       setMessage("Please enter your first and last name.");
+      return;
+    }
+    const nameError = isLogin ? "" : findNameError([["First name", firstName], ["Last name", lastName]], NAME_PART_MAX_LENGTH);
+    if (nameError) {
+      setMessage(nameError);
       return;
     }
     if (!isLogin && (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9\s]/.test(password))) {
@@ -60,7 +70,10 @@ function AuthPage() {
           setMessage("Your profile could not be loaded. Please contact the administrator.");
           return;
         }
-        navigate(profile.role === "admin" ? "/admin" : profile.role === "client" ? "/" : "/photographer");
+        // Clients who clicked "Book now" on a package return to the booking form with it selected.
+        const from = (location.state as { from?: unknown } | null)?.from;
+        const clientDestination = typeof from === "string" && from.startsWith("/book") ? from : "/";
+        navigate(profile.role === "admin" ? "/admin" : profile.role === "client" ? clientDestination : "/photographer");
       } else {
         const { data, error } = await supabase.auth.signUp({
           email, password,
@@ -199,12 +212,12 @@ function AuthPage() {
                   <input
                     id="firstName"
                     name="firstName"
-                    type="text"
+                    {...nameInputProps}
+                    maxLength={NAME_PART_MAX_LENGTH}
                     placeholder="Enter your first name"
                     autoComplete="given-name"
-                    autoCapitalize="words"
                     value={firstName}
-                    onChange={(event) => setFirstName(capitalizeName(event.target.value))}
+                    onChange={(event) => setFirstName(capitalizeName(stripNameChars(event.target.value)))}
                     required
                   />
                 </div>
@@ -214,12 +227,12 @@ function AuthPage() {
                   <input
                     id="lastName"
                     name="lastName"
-                    type="text"
+                    {...nameInputProps}
+                    maxLength={NAME_PART_MAX_LENGTH}
                     placeholder="Enter your last name"
                     autoComplete="family-name"
-                    autoCapitalize="words"
                     value={lastName}
-                    onChange={(event) => setLastName(capitalizeName(event.target.value))}
+                    onChange={(event) => setLastName(capitalizeName(stripNameChars(event.target.value)))}
                     required
                   />
                 </div>
@@ -233,7 +246,7 @@ function AuthPage() {
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="09XX XXX XXXX"
+                    placeholder="09XXXXXXXXX"
                     autoComplete="tel"
                     inputMode="numeric"
                     pattern="[0-9]{11}"
@@ -254,7 +267,8 @@ function AuthPage() {
               <input
                 id="email"
                 name="email"
-                type="email"
+                {...emailInputProps}
+                onInput={filterEmailInput}
                 placeholder="client@gmail.com"
                 autoComplete="email"
                 required

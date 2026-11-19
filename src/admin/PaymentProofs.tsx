@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useToastMessage } from "../lib/toast";
 import "../components/LiveRecords.css";
 import "./PaymentProofs.css";
+import Pagination from "../components/Pagination";
+import { clampPage, pageSlice } from "../lib/pagination";
 
 type Payment = { id: string; booking_id: string; amount: number; method: string; status: string; proof_path: string | null; created_at: string; bookings: { client_name: string; event_type: string; event_date: string; is_test: boolean; required_down_payment: number } | null };
 const peso = (value: number) => new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(value);
@@ -67,7 +70,10 @@ export default function PaymentProofs() {
   const [preview, setPreview] = useState<{ id: string; url: string } | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [notice, setNotice] = useState("");
+  // Success messages are shown as toasts (see components/ToastProvider).
+  useToastMessage(notice, setNotice, "success");
   const [filter, setFilter] = useState("All");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     let active = true;
@@ -143,11 +149,14 @@ export default function PaymentProofs() {
   }
 
   const visiblePayments = filter === "All" ? payments : payments.filter((payment) => payment.status === filter);
-  return <section className="live-records payments-page"><header className="payments-header"><div><p>ADMIN WORKSPACE / PAYMENTS</p><h2>Payments<span>.</span></h2><span>Review payment proofs and keep track of your bookings.</span></div>{!loading && !error && <div className="payments-review-count"><strong>{payments.filter((payment) => payment.status === "For Verification").length}</strong><span>awaiting review</span></div>}</header>
-    {notice && <div className="live-records-note" role="status">{notice}</div>}
+  // 10 payments per page; switching the status filter starts again at page 1.
+  const currentPage = clampPage(page, visiblePayments.length);
+  return <section className="live-records payments-page"><header className="payments-header"><div><p>PAYMENT REVIEW</p><h2>Payments</h2><span>Review payment proofs and keep track of your bookings.</span></div>{!loading && !error && <div className="payments-review-count"><strong>{payments.filter((payment) => payment.status === "For Verification").length}</strong><span>awaiting review</span></div>}</header>
+    
     {error && <div role="alert">{error} <button type="button" onClick={() => { setLoading(true); setError(""); setRetry((value) => value + 1); }}>Retry</button></div>}
-    <div className="payments-panel"><div className="payments-toolbar"><div><span>PAYMENT RECORDS</span><h3>All transactions</h3></div><div className="payments-filters">{["All", "For Verification", "Verified", "Rejected"].map((option) => <button key={option} type="button" aria-pressed={filter === option} onClick={() => setFilter(option)}>{option === "For Verification" ? "For review" : option}</button>)}</div></div>
-    {loading ? <p className="payments-empty" role="status">Loading payments...</p> : error ? <p className="payments-empty">Payment records could not be loaded.</p> : !visiblePayments.length ? <div className="payments-empty"><strong>{payments.length ? "No matching payments" : "No payments yet"}</strong><p>{payments.length ? "There are no payments in this category." : "Submitted payment proofs will appear here."}</p></div> : <div className="payments-table-wrap"><table className="payments-table"><thead><tr><th>Client / event</th><th>Amount</th><th>Method</th><th>Status</th><th>Payment proof</th></tr></thead><tbody>{visiblePayments.map((payment) => <tr key={payment.id}><td><strong>{payment.bookings?.client_name ?? "Client unavailable"}</strong><small>{payment.bookings ? `${payment.bookings.event_type} · ${payment.bookings.event_date}` : payment.booking_id}</small>{payment.bookings?.is_test && <small className="payments-test">TEST · simulated</small>}</td><td><strong>{peso(Number(payment.amount))}</strong><small>{payment.status === "Verified" ? payment.bookings?.is_test ? "Simulated amount" : "Verified amount" : "Expected amount"}</small></td><td>{payment.method}</td><td><span className={`payments-status ${payment.status === "Verified" ? "verified" : payment.status === "Rejected" ? "rejected" : "pending"}`}>{payment.status}</span></td><td>{payment.proof_path ? <button className="payment-proof-view-button" type="button" disabled={!!opening} onClick={() => void previewProof(payment)}>{opening === payment.id ? "Loading..." : "View proof →"}</button> : <span className="payments-no-proof">No proof</span>}</td></tr>)}</tbody></table></div>}
+    <div className="payments-panel"><div className="payments-toolbar"><div><span>PAYMENT RECORDS</span><h3>All transactions</h3></div><div className="payments-filters">{["All", "For Verification", "Verified", "Rejected"].map((option) => <button key={option} type="button" aria-pressed={filter === option} onClick={() => { setFilter(option); setPage(1); }}>{option === "For Verification" ? "For review" : option}</button>)}</div></div>
+    {loading ? <p className="payments-empty" role="status">Loading payments...</p> : error ? <p className="payments-empty">Payment records could not be loaded.</p> : !visiblePayments.length ? <div className="payments-empty"><strong>{payments.length ? "No matching payments" : "No payments yet"}</strong><p>{payments.length ? "There are no payments in this category." : "Submitted payment proofs will appear here."}</p></div> : <div className="payments-table-wrap"><table className="payments-table"><thead><tr><th>Client / event</th><th>Amount</th><th>Method</th><th>Status</th><th>Payment proof</th></tr></thead><tbody>{pageSlice(visiblePayments, currentPage).map((payment) => <tr key={payment.id}><td><strong>{payment.bookings?.client_name ?? "Client unavailable"}</strong><small>{payment.bookings ? `${payment.bookings.event_type} · ${payment.bookings.event_date}` : payment.booking_id}</small>{payment.bookings?.is_test && <small className="payments-test">TEST · simulated</small>}</td><td><strong>{peso(Number(payment.amount))}</strong><small>{payment.status === "Verified" ? payment.bookings?.is_test ? "Simulated amount" : "Verified amount" : "Expected amount"}</small></td><td>{payment.method}</td><td><span className={`payments-status ${payment.status === "Verified" ? "verified" : payment.status === "Rejected" ? "rejected" : "pending"}`}>{payment.status}</span></td><td>{payment.proof_path ? <button className="payment-proof-view-button" type="button" disabled={!!opening} onClick={() => void previewProof(payment)}>{opening === payment.id ? "Loading..." : "View proof →"}</button> : <span className="payments-no-proof">No proof</span>}</td></tr>)}</tbody></table></div>}
+    {!loading && !error && <Pagination page={currentPage} total={visiblePayments.length} onChange={setPage} itemLabel="payments" className="payments-pagination" />}
     </div>
     {preview && payments.find((payment) => payment.id === preview.id) && <ProofModal payment={payments.find((payment) => payment.id === preview.id)!} url={preview.url} onClose={() => { if (!verifying) setPreview(null); }} onDownload={() => { const payment = payments.find((item) => item.id === preview.id); if (payment) void openProof(payment); }} downloading={!!opening} error={error} onVerify={() => { const payment = payments.find((item) => item.id === preview.id); if (payment) void verifyTestPayment(payment); }} onReview={(action, amount) => { const payment = payments.find((item) => item.id === preview.id); if (payment) void reviewPayment(payment, action, amount); }} verifying={verifying} />}
   </section>;

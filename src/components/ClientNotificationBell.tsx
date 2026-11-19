@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/authContext";
 import { supabase } from "../lib/supabase";
 import "./ClientNotificationBell.css";
@@ -14,6 +14,25 @@ export default function ClientNotificationBell() {
   const [count, setCount] = useState(0);
   const [error, setError] = useState("");
   const [marking, setMarking] = useState("");
+  const { pathname } = useLocation();
+  const [openPath, setOpenPath] = useState(pathname);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close the panel whenever the client navigates to another page.
+  if (openPath !== pathname) {
+    setOpenPath(pathname);
+    setOpen(false);
+  }
+
+  // Also close on a click outside the panel (Escape is handled on the container).
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [open]);
 
   const load = useCallback(async () => {
     if (!userId) return;
@@ -48,7 +67,7 @@ export default function ClientNotificationBell() {
     finally { setMarking(""); }
   }
 
-  return <div className="client-bell-container" onKeyDown={(event) => { if (event.key === "Escape") setOpen(false); }}>
+  return <div className="client-bell-container" ref={containerRef} onKeyDown={(event) => { if (event.key === "Escape") setOpen(false); }}>
     <button className="client-bell-button" type="button" aria-label={`Notifications${count ? `, ${count} unread` : ""}`} aria-expanded={open} aria-controls="client-notification-panel" onClick={() => { setOpen((current) => !current); void load(); }}>
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></svg>
       {count > 0 && <span className="client-bell-badge">{count > 99 ? "99+" : count}</span>}

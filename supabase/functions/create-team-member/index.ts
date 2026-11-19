@@ -22,6 +22,10 @@ Deno.serve(async (request: Request) => {
     const phone = typeof body.phone === "string" ? body.phone.trim() : "";
     const password = typeof body.password === "string" ? body.password : "";
     const role = body.role;
+    // Letters only, separated by spaces, apostrophes, hyphens, or periods (same rule as src/lib/validation.ts).
+    if (!/^[\p{L}\p{M}]+(?:(?:\.? +|[.'’-])[\p{L}\p{M}]+)*\.?$/u.test(fullName) || fullName.length < 2 || fullName.length > 150) return reply(400, "Full name must be 2–150 characters and contain letters only. Spaces, apostrophes, hyphens, and periods are allowed.");
+    // name@domain.tld with a 2+ letter ending (same rule as isValidEmail in src/lib/validation.ts).
+    if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}$/.test(email) || email.includes("..") || email.startsWith(".") || email.includes(".@")) return reply(400, "Enter a valid email address with @ and a domain ending, like juan@gmail.com.");
     if (!fullName || fullName.length > 150 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || (phone && !/^\d{11}$/.test(phone)) || password.length < 8 || password.length > 128 || !["photographer", "videographer"].includes(role)) return reply(400, "Check the name, email, optional 11-digit phone, password, and role.");
     const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
     // Admin provides and shares the initial password. Email is confirmed by admin,

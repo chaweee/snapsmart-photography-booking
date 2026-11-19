@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { PHONE_PATTERN, emailInputProps, nameInputProps, stripEmailChars, stripNameChars, stripPhoneChars } from "../lib/validation";
 
 interface Props {
   userId?: string;
@@ -24,7 +25,7 @@ export default function BookingClientInformation({ userId, email, authLoading }:
         return;
       }
       if (!changed.current.name) setName(data.full_name ?? "");
-      if (!changed.current.phone) setPhone(data.phone ?? "");
+      if (!changed.current.phone) setPhone(stripPhoneChars(data.phone ?? ""));
     });
     return () => { active = false; };
   }, [userId]);
@@ -44,15 +45,15 @@ export default function BookingClientInformation({ userId, email, authLoading }:
       <div className="booking-field-grid">
         <label className="booking-field">
           <span>Full Name</span>
-          <input name="clientName" type="text" autoComplete="name" placeholder="Enter client's full name" required value={name} onChange={(event) => { changed.current.name = true; setName(event.target.value); }} />
+          <input name="clientName" {...nameInputProps} autoComplete="name" placeholder="Enter client's full name" required value={name} onChange={(event) => { changed.current.name = true; setName(stripNameChars(event.target.value)); }} />
         </label>
         <label className="booking-field">
           <span>Email Address</span>
-          <input name="email" type="email" autoComplete="email" placeholder="client@example.com" required value={contactEmail} onChange={(event) => setContactEmail(event.target.value)} />
+          <input name="email" {...emailInputProps} autoComplete="email" placeholder="client@example.com" required value={contactEmail} onChange={(event) => setContactEmail(stripEmailChars(event.target.value))} />
         </label>
         <label className="booking-field">
           <span>Phone Number</span>
-          <input name="phone" type="tel" autoComplete="tel" placeholder="09XX XXX XXXX" required value={phone} onChange={(event) => { changed.current.phone = true; setPhone(event.target.value); }} />
+          <input name="phone" type="tel" inputMode="numeric" autoComplete="tel" placeholder="09XXXXXXXXX" pattern={PHONE_PATTERN} minLength={11} maxLength={11} title="Enter exactly 11 digits" required value={phone} onChange={(event) => { changed.current.phone = true; setPhone(stripPhoneChars(event.target.value)); }} />
         </label>
         <label className="booking-field">
           <span>Address</span>

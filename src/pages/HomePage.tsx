@@ -278,7 +278,7 @@ function HomePage({ isLoggedIn }: HomePageProps) {
                 </div>
               </div>
 
-              <Link to={bookingDestination} className="text-link">
+              <Link to={isLoggedIn ? bookingDestination : "/signup"} className="text-link">
                 {isLoggedIn ? "Start a new booking" : "Create your client account"}
                 <span>→</span>
               </Link>

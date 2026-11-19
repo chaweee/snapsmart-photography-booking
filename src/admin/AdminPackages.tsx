@@ -1,6 +1,9 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { formatPeso } from "../data/packages";
 import { supabase } from "../lib/supabase";
+import { useToastMessage } from "../lib/toast";
+import Pagination from "../components/Pagination";
+import { clampPage, pageSlice } from "../lib/pagination";
 import "./Admin.css";
 
 type CoverageType = "photo" | "photo_video" | "soft_copy";
@@ -41,10 +44,15 @@ function AdminPackages() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  // Success messages are shown as toasts (see components/ToastProvider).
+  useToastMessage(notice, setNotice, "success");
   const [form, setForm] = useState<PackageForm | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
+  // Package cards and the package list table each show 10 per page.
+  const [cardPage, setCardPage] = useState(1);
+  const [tablePage, setTablePage] = useState(1);
 
   async function loadPackages() {
     setLoading(true);
@@ -119,11 +127,11 @@ function AdminPackages() {
   return (
     <div className="admin-packages-page">
       <section className="admin-page-heading">
-        <div><p>Manage Packages</p><h2>Photography packages</h2></div>
-        <div className="dashboard-actions"><button type="button" onClick={openAdd}>Add Package</button></div>
+        <div><p>PACKAGE MANAGEMENT</p><h2>Photography packages</h2><span>Set the packages, prices, and inclusions clients can book.</span></div>
+        <div className="dashboard-actions"><button type="button" className="admin-action-button" onClick={openAdd}>+ Add package</button></div>
       </section>
 
-      {notice && <p role="status">{notice}</p>}
+      
       {error && <div role="alert"><p>{error}</p><button type="button" onClick={() => void loadPackages()}>Try again</button></div>}
       {loading ? <p>Loading packages...</p> : !error && <>
         <section className="package-summary-grid">
@@ -135,19 +143,21 @@ function AdminPackages() {
 
         {packages.length === 0 && <p>No packages found. Add your first package above.</p>}
         <section className="admin-package-grid">
-          {packages.map((item) => <article className="admin-package-card" key={item.id}>
-            <div className="admin-package-card-top"><div><span>{item.id}</span><h3>{item.name}</h3><p>{item.subtitle}</p></div><strong>{formatPeso(Number(item.price))}</strong></div>
+          {pageSlice(packages, clampPage(cardPage, packages.length)).map((item) => <article className="admin-package-card" key={item.id}>
+            <div className="admin-package-card-top"><div><span>{item.id}</span><h3 title={item.name}>{item.name}</h3><p title={item.subtitle}>{item.subtitle}</p></div><strong>{formatPeso(Number(item.price))}</strong></div>
             <div className="admin-package-meta"><span>{coverageLabels[item.coverage_type]}</span><span className="package-status-pill">{item.is_active ? "Active" : "Inactive"}</span></div>
-            <div className="admin-package-inclusions"><h4>Inclusions</h4><ul>{item.inclusions.map((inclusion, index) => <li key={`${index}-${inclusion}`}>{inclusion}</li>)}</ul><p>Down payment: {formatPeso(Number(item.required_down_payment))}</p></div>
+            <div className="admin-package-inclusions"><h4>Inclusions</h4><ul>{item.inclusions.map((inclusion, index) => <li key={`${index}-${inclusion}`}>{inclusion}</li>)}</ul><p className="admin-package-deposit">Down payment: {formatPeso(Number(item.required_down_payment))}</p></div>
             <div className="admin-package-actions"><button type="button" onClick={() => openEdit(item)}>Edit Package</button></div>
           </article>)}
         </section>
+        <Pagination className="admin-list-pagination" page={clampPage(cardPage, packages.length)} total={packages.length} onChange={setCardPage} itemLabel="packages" />
 
         <section className="admin-panel package-table-panel">
           <div className="admin-panel-heading"><div><p>Package Records</p><h3>Package list</h3></div></div>
           <div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Package ID</th><th>Package Name</th><th>Coverage</th><th>Price</th><th>Status</th><th>No. of Inclusions</th></tr></thead><tbody>
-            {packages.map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.name}</strong><br /><span>{item.subtitle}</span></td><td>{coverageLabels[item.coverage_type]}</td><td>{formatPeso(Number(item.price))}</td><td><span className="status-pill">{item.is_active ? "Active" : "Inactive"}</span></td><td>{item.inclusions.length}</td></tr>)}
+            {pageSlice(packages, clampPage(tablePage, packages.length)).map((item) => <tr key={item.id}><td>{item.id}</td><td><strong>{item.name}</strong><br /><span>{item.subtitle}</span></td><td>{coverageLabels[item.coverage_type]}</td><td>{formatPeso(Number(item.price))}</td><td><span className="status-pill">{item.is_active ? "Active" : "Inactive"}</span></td><td>{item.inclusions.length}</td></tr>)}
           </tbody></table></div>
+          <Pagination className="admin-list-pagination" page={clampPage(tablePage, packages.length)} total={packages.length} onChange={setTablePage} itemLabel="packages" />
         </section>
       </>}
 

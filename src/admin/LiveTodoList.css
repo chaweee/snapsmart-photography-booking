@@ -47,3 +47,23 @@
 .live-todo-form-actions { display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #eee6de; padding-top: 16px; }
 .live-todo-form-actions button:first-child { border: 1px solid #ded4ca; padding: 10px 18px; background: white; cursor: pointer; }
 @media (max-width: 650px) { .live-todo-summary { grid-template-columns: 1fr; } .live-todo-panel-top { align-items: start; flex-direction: column; } .live-todo-list li { flex-wrap: wrap; } .live-todo-actions { margin-left: 33px; } .live-todo-form-grid { grid-template-columns: 1fr; } }
+
+/* Slightly larger task list text. */
+.live-todo-panel-top h3 { font-size: 1.5rem; }
+.live-todo-panel-top label { font-size: .8rem; }
+.live-todo-panel-top select { font-size: .9rem; }
+.live-todo-list li { padding: 18px 20px; }
+.live-todo-copy > strong { font-size: 1.02rem; }
+.live-todo-copy p { font-size: .9rem; }
+.live-todo-meta { font-size: .78rem; }
+.live-todo-meta span { padding: 5px 11px; }
+.live-todo-actions button { padding: 8px 13px; font-size: .8rem; }
+
+/* Add / Edit task dialog: slightly larger, consistent text. */
+.live-todo-dialog-header h3 { font-size: 2rem; }
+.live-todo-dialog label { font-size: .9rem; }
+.live-todo-dialog label span { font-size: .82rem; }
+.live-todo-dialog input,
+.live-todo-dialog select,
+.live-todo-dialog textarea { padding: 11px 12px; font-size: .95rem; font-weight: 400; }
+.live-todo-form-actions button { min-height: 44px; padding: 0 20px !important; font-family: Georgia, "Times New Roman", serif; font-size: .9rem !important; font-weight: 700; }

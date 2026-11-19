@@ -119,3 +119,10 @@
 @media (max-width: 800px) { .client-gallery-masonry { columns: 2; column-gap: 12px; } .client-gallery-photo { margin-bottom: 12px; } }
 @media (max-width: 480px) { .client-gallery-masonry { columns: 1; } .client-photo-stage { grid-template-columns: 32px minmax(0, 1fr) 32px; gap: 4px; padding: 0 5px; } .client-photo-arrow { width: 30px; height: 30px; } .client-photo-viewer-top, .client-photo-viewer-bottom { padding: 14px; } }
 @media (prefers-reduced-motion: reduce) { .client-gallery-photo img { transition: none; } .client-gallery-photo:hover img { transform: none; } }
+
+/* Slightly larger text in the gallery forms (e.g. "Create a gallery"). */
+.private-gallery-panel h3 { font-size: 1.45rem; }
+.private-gallery-panel label { font-size: 0.9rem; }
+.private-gallery-panel input,
+.private-gallery-panel select { padding: 11px 12px; font-size: 0.95rem; font-weight: 400; }
+.private-gallery-panel button:not(.private-gallery-select) { font-size: 0.88rem; }

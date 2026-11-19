@@ -2,6 +2,8 @@ import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatPeso, type PhotographyPackage } from "../data/packages";
 import { supabase } from "../lib/supabase";
+import { useToastMessage } from "../lib/toast";
+import { EMAIL_ERROR, PHONE_PATTERN, emailInputProps, filterEmailInput, filterNameInput, findNameError, isValidEmail, isValidPhone, nameInputProps } from "../lib/validation";
 import "./Admin.css";
 
 function AdminWalkInBooking() {
@@ -16,6 +18,8 @@ function AdminWalkInBooking() {
   const [busy, setBusy] = useState(false);
   const [locked, setLocked] = useState(false);
   const [saved, setSaved] = useState(false);
+  // Messages are shown as toasts: the "saved" confirmation as success, everything else as an error.
+  useToastMessage(message, setMessage, saved ? "success" : "error");
   const guard = useRef(false);
   const request = useRef<{ id: string; payload: Record<string, unknown> } | null>(null);
 
@@ -51,6 +55,15 @@ function AdminWalkInBooking() {
     if (busy || saved || guard.current) return;
     const form = new FormData(event.currentTarget);
     if (!request.current) {
+      const nameError = findNameError([
+        ["Full name", String(form.get("clientName") ?? "")],
+        ...(eventType === "Wedding"
+          ? [["Bride's full name", String(form.get("brideName") ?? "")], ["Groom's full name", String(form.get("groomName") ?? "")]] as Array<[string, string]>
+          : []),
+      ]);
+      if (nameError) { setMessage(nameError); return; }
+      if (!isValidEmail(String(form.get("email") ?? ""))) { setMessage(EMAIL_ERROR); return; }
+      if (!isValidPhone(String(form.get("phone") ?? "").trim())) { setMessage("Phone number must contain exactly 11 digits."); return; }
       const amountText = String(form.get("amountReceived") ?? "").trim();
       const amount = Number(amountText);
       if (!/^\d+(?:\.\d{1,2})?$/.test(amountText) || !Number.isFinite(amount) || amount > selectedPackage.price) { setMessage("Enter the actual cash received using up to two decimal places, without commas."); return; }
@@ -70,19 +83,20 @@ function AdminWalkInBooking() {
     finally { guard.current = false; setBusy(false); }
   };
 
-  if (loading || loadError || !selectedPackage) return <div className="admin-walkin-page"><h2>Create walk-in booking</h2><p role={loadError ? "alert" : "status"}>{loading ? "Loading packages..." : loadError ? `Could not load booking data: ${loadError}` : "No active packages are available yet."}</p></div>;
+  if (loading || loadError || !selectedPackage) return <div className="admin-walkin-page"><section className="admin-page-heading"><div><p>FRONT DESK</p><h2>Create walk-in booking</h2><span>Record a booking for clients who visit the studio in person.</span></div></section><p role={loadError ? "alert" : "status"}>{loading ? "Loading packages..." : loadError ? `Could not load booking data: ${loadError}` : "No active packages are available yet."}</p></div>;
 
   return (
     <div className="admin-walkin-page">
       <section className="admin-page-heading">
         <div>
-          <p>Walk-In Booking</p>
+          <p>FRONT DESK</p>
           <h2>Create walk-in booking</h2>
+          <span>Record a booking for clients who visit the studio in person.</span>
         </div>
 
         <div className="dashboard-actions">
-          <Link to="/admin/bookings">View Bookings</Link>
-          <Link to="/admin/calendar">Open Calendar</Link>
+          <Link className="admin-action-button" to="/admin/bookings">View bookings <span aria-hidden="true">→</span></Link>
+          <Link className="admin-action-button" to="/admin/calendar">Open calendar <span aria-hidden="true">→</span></Link>
         </div>
       </section>
 
@@ -102,7 +116,8 @@ function AdminWalkInBooking() {
                 <span>Full Name</span>
                 <input
                   name="clientName"
-                  type="text"
+                  {...nameInputProps}
+                  onInput={filterNameInput}
                   placeholder="Enter client's full name"
                   required
                 />
@@ -113,9 +128,12 @@ function AdminWalkInBooking() {
                 <input
                   name="phone"
                   type="tel"
-                  placeholder="09XX XXX XXXX"
+                  placeholder="09XXXXXXXXX"
                   inputMode="numeric"
+                  pattern={PHONE_PATTERN}
+                  minLength={11}
                   maxLength={11}
+                  title="Enter exactly 11 digits"
                   value={phone}
                   onChange={(event) => setPhone(event.target.value.replace(/\D/g, "").slice(0, 11))}
                   required
@@ -126,7 +144,8 @@ function AdminWalkInBooking() {
                 <span>Email Address</span>
                 <input
                   name="email"
-                  type="email"
+                  {...emailInputProps}
+                  onInput={filterEmailInput}
                   placeholder="client@example.com"
                   required
                 />
@@ -224,7 +243,8 @@ function AdminWalkInBooking() {
                     <span>Bride's Full Name</span>
                     <input
                       name="brideName"
-                      type="text"
+                      {...nameInputProps}
+                      onInput={filterNameInput}
                       placeholder="Enter bride's full name"
                       required
                     />
@@ -234,7 +254,8 @@ function AdminWalkInBooking() {
                     <span>Groom's Full Name</span>
                     <input
                       name="groomName"
-                      type="text"
+                      {...nameInputProps}
+                      onInput={filterNameInput}
                       placeholder="Enter groom's full name"
                       required
                     />
@@ -350,7 +371,6 @@ function AdminWalkInBooking() {
               The client must sign up with this email and verify it to access the booking. Confirm the email carefully before saving.
             </p>
 
-            {message && <div className="booking-message">{message}</div>}
           </div>
         </form>
 

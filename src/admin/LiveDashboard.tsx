@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
 import "./Admin.css";
 import "./LiveDashboard.css";
+import Pagination from "../components/Pagination";
+import { BookingStatusPanel, PackageDemandPanel } from "./DashboardBreakdown";
+import { PAGE_SIZE, clampPage } from "../lib/pagination";
 
 type Booking = { id: string; client_name: string; event_type: string; event_date: string; start_time: string | null; status: string; total_amount: number; package_snapshot: { name?: string } | null; package_id: string | null };
 type Payment = { id: string; booking_id: string; amount: number; status: string };
@@ -42,7 +45,10 @@ async function loadReport(period: string): Promise<Report> {
 }
 
 export default function LiveDashboard() {
+  // "" = all event dates (the default). The month box shows "All dates" in that case
+  // so it's clear what Export/Print will cover.
   const [period, setPeriod] = useState("");
+  const [page, setPage] = useState(1);
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
@@ -70,6 +76,11 @@ export default function LiveDashboard() {
     return { bookings, payments, verified, pending, total, statusCounts: [...statusCounts], packageCounts: [...packageCounts].sort((a, b) => b[1] - a[1]) };
   }, [ready, report]);
 
+  // Scheduled bookings table: 10 rows per page on screen. Rows on other pages are only hidden
+  // (shown again when printing), so Print summary and Export CSV still include every booking.
+  const sortedBookings = useMemo(() => [...summary.bookings].sort((a, b) => a.event_date.localeCompare(b.event_date)), [summary.bookings]);
+  const tablePage = clampPage(page, sortedBookings.length);
+
   const periodLabel = period ? new Date(Number(period.slice(0, 4)), Number(period.slice(5, 7)) - 1, 1).toLocaleDateString("en-PH", { month: "long", year: "numeric" }) : "All event dates";
   const cards = [
     { label: "Bookings", value: String(summary.bookings.length), note: period ? "Events scheduled in this month" : "Events across all dates" },
@@ -96,15 +107,14 @@ export default function LiveDashboard() {
   }
 
   return <section className="live-dashboard dashboard-print-area">
-    <header className="live-dashboard-header"><div><p>BUSINESS OVERVIEW</p><h2>Admin dashboard</h2><span>A clear view of your bookings and payments.</span></div><div className="live-dashboard-controls dashboard-print-hidden"><label>Event month<input type="month" value={period} min="2000-01" max="9998-12" onChange={(event) => { setError(""); setPeriod(event.target.value); }} /></label>{period && <button type="button" onClick={() => { setError(""); setPeriod(""); }}>All dates</button>}<button type="button" disabled={!ready} onClick={exportReport}>Export CSV</button><button type="button" disabled={!ready} onClick={() => window.print()}>Print summary</button></div></header>
-    <div className="live-period"><div><span>REPORT PERIOD</span><strong>{periodLabel}</strong></div></div>
+    <header className="live-dashboard-header"><div><p>BUSINESS OVERVIEW</p><h2>Admin dashboard</h2><span>A clear view of your bookings and payments.</span><p className="live-print-only">Report period: {periodLabel}</p></div><div className="live-dashboard-toolbar"><div className="live-dashboard-controls dashboard-print-hidden"><label>Event month<span className={period ? "live-month-field" : "live-month-field is-all-dates"} data-empty-label="All dates"><input type="month" value={period} min="2000-01" max="9998-12" aria-description={period ? undefined : "Showing all event dates"} onChange={(event) => { setError(""); setPeriod(event.target.value); setPage(1); }} /></span></label>{period && <button type="button" onClick={() => { setError(""); setPeriod(""); setPage(1); }}>All dates</button>}<button type="button" disabled={!ready} title={`Export: ${periodLabel}`} onClick={exportReport}>Export CSV</button><button type="button" disabled={!ready} title={`Print: ${periodLabel}`} onClick={() => window.print()}>Print summary</button></div></div></header>
     {error ? <div className="live-dashboard-error" role="alert">Could not load dashboard: {error} <button type="button" onClick={() => { setError(""); setReport(null); setRetry((value) => value + 1); }}>Try again</button></div> : !ready ? <p role="status">Loading dashboard...</p> : <>
       <div className="live-dashboard-cards">{cards.map((card) => <article key={card.label}><span>{card.label}</span><strong>{card.value}</strong><p>{card.note}</p></article>)}</div>
+      <section className="live-dashboard-panel"><div className="live-panel-heading"><div><span>FINANCIAL CONTEXT</span><h3>Booked value</h3></div><strong className="live-booked-value">{peso(summary.total)}</strong></div><p className="live-empty">Total booking amounts for the selected event period, including cancelled bookings. This is not revenue or an outstanding balance. Only payment records marked Verified are counted as verified payments.</p></section>
       <div className="live-dashboard-grid">
-        <section className="live-dashboard-panel"><div className="live-panel-heading"><div><span>BREAKDOWN</span><h3>Booking status</h3></div><strong>{summary.bookings.length} total</strong></div>{summary.statusCounts.length ? <div className="live-chart-list">{summary.statusCounts.map(([status, count]) => <div className="live-chart-row" key={status}><div><span>{status}</span><strong>{count}</strong></div><div className="live-chart-track" aria-hidden="true"><div className="live-chart-bar" style={{ width: `${count / summary.bookings.length * 100}%` }} /></div></div>)}</div> : <p className="live-empty">No bookings found for this period. The chart will appear when booking data is available.</p>}</section>
-        <section className="live-dashboard-panel"><div className="live-panel-heading"><div><span>POPULAR CHOICES</span><h3>Package demand</h3></div></div>{summary.packageCounts.length ? <div className="live-chart-list">{summary.packageCounts.map(([name, count]) => <div className="live-chart-row" key={name}><div><span>{name}</span><strong>{count}</strong></div><div className="live-chart-track" aria-hidden="true"><div className="live-chart-bar" style={{ width: `${count / summary.bookings.length * 100}%` }} /></div></div>)}</div> : <p className="live-empty">Package demand will appear when bookings are available.</p>}</section>
-        <section className="live-dashboard-panel live-dashboard-wide"><div className="live-panel-heading"><div><span>{period ? "EVENTS THIS MONTH" : "ALL EVENTS"}</span><h3>Scheduled bookings</h3></div><strong>{summary.bookings.length} bookings</strong></div>{summary.bookings.length ? <div className="live-table-wrap"><table><thead><tr><th>Date</th><th>Client</th><th>Event</th><th>Package</th><th>Status</th></tr></thead><tbody>{[...summary.bookings].sort((a, b) => a.event_date.localeCompare(b.event_date)).map((booking) => <tr key={booking.id}><td>{booking.event_date}</td><td>{booking.client_name}</td><td>{booking.event_type}</td><td>{booking.package_snapshot?.name || booking.package_id || "Unspecified"}</td><td>{booking.status}</td></tr>)}</tbody></table></div> : <p className="live-empty">No scheduled bookings yet.</p>}</section>
-        <section className="live-dashboard-panel live-dashboard-wide"><div className="live-panel-heading"><div><span>FINANCIAL CONTEXT</span><h3>Booked value</h3></div><strong>{peso(summary.total)}</strong></div><p className="live-empty">Total booking amounts for the selected event period, including cancelled bookings. This is not revenue or an outstanding balance. Only payment records marked Verified are counted as verified payments.</p></section>
+        <BookingStatusPanel statusCounts={summary.statusCounts} total={summary.bookings.length} periodLabel={periodLabel} pendingPayments={summary.pending.length} />
+        <PackageDemandPanel packageCounts={summary.packageCounts} total={summary.bookings.length} />
+        <section className="live-dashboard-panel live-dashboard-wide"><div className="live-panel-heading"><div><span>{period ? "EVENTS THIS MONTH" : "ALL EVENTS"}</span><h3>Scheduled bookings</h3></div><strong>{summary.bookings.length} bookings</strong></div>{summary.bookings.length ? <div className="live-table-wrap"><table><thead><tr><th>Date</th><th>Client</th><th>Event</th><th>Package</th><th>Status</th></tr></thead><tbody>{sortedBookings.map((booking, index) => <tr key={booking.id} className={Math.floor(index / PAGE_SIZE) + 1 === tablePage ? undefined : "live-row-offpage"}><td>{booking.event_date}</td><td>{booking.client_name}</td><td>{booking.event_type}</td><td>{booking.package_snapshot?.name || booking.package_id || "Unspecified"}</td><td>{booking.status}</td></tr>)}</tbody></table></div> : <p className="live-empty">No scheduled bookings yet.</p>}<Pagination page={tablePage} total={sortedBookings.length} onChange={setPage} itemLabel="bookings" /></section>
       </div>
     </>}
   </section>;

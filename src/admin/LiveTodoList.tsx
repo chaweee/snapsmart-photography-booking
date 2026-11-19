@@ -1,5 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../lib/supabase";
+import { useToastMessage } from "../lib/toast";
+import Pagination from "../components/Pagination";
+import { clampPage, pageSlice } from "../lib/pagination";
 import "./LiveTodoList.css";
 
 type TaskStatus = "Pending" | "In Progress" | "Completed";
@@ -13,12 +16,15 @@ export default function LiveTodoList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  // Success messages are shown as toasts (see components/ToastProvider).
+  useToastMessage(notice, setNotice, "success");
   const [retry, setRetry] = useState(0);
   const [filter, setFilter] = useState("All");
   const [form, setForm] = useState<TaskForm | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     let active = true;
@@ -59,18 +65,6 @@ export default function LiveTodoList() {
     finally { setBusy(false); }
   }
 
-  async function setCompleted(task: Task, completed: boolean) {
-    if (busy) return;
-    setBusy(true); setError(""); setNotice("");
-    try {
-      const { data, error: updateError } = await supabase.from("admin_tasks").update({ status: completed ? "Completed" : "Pending" }).eq("id", task.id).select("id,title,description,due_date,priority,status,created_at").single();
-      if (updateError) throw updateError;
-      setTasks((current) => current.map((item) => item.id === task.id ? data as Task : item));
-      setNotice(completed ? "Task completed." : "Task marked pending.");
-    } catch (failure) { setError(failure instanceof Error ? failure.message : "Could not update the task."); }
-    finally { setBusy(false); }
-  }
-
   async function deleteTask(task: Task) {
     if (busy || !window.confirm(`Delete task “${task.title}”? This cannot be undone.`)) return;
     setBusy(true); setError(""); setNotice("");
@@ -84,17 +78,19 @@ export default function LiveTodoList() {
   }
 
   const visible = tasks.filter((task) => filter === "All" || task.status === filter);
+  // 10 tasks per page; changing the filter starts again at page 1.
+  const taskPage = clampPage(page, visible.length);
   return <section className="live-todo">
-    <header className="live-todo-header"><div><p>ADMIN WORKSPACE</p><h2>To-do list</h2><span>Keep track of the little things that make every event happen.</span></div><button type="button" onClick={openAdd} disabled={busy}>+ Add task</button></header>
+    <header className="live-todo-header"><div><p>TASK PLANNER</p><h2>To-do list</h2><span>Keep track of the little things that make every event happen.</span></div><button type="button" className="admin-action-button" onClick={openAdd} disabled={busy}>+ Add task</button></header>
     <div className="live-todo-summary">{(["Pending", "In Progress", "Completed"] as TaskStatus[]).map((status) => <div key={status}><span>{status}</span><strong>{tasks.filter((task) => task.status === status).length}</strong><small>tasks</small></div>)}</div>
-    {notice && <p className="live-todo-notice" role="status">{notice}</p>}
+    
     {error && <div className="live-todo-error" role="alert">{error} {loading ? null : <button type="button" onClick={() => { setLoading(true); setError(""); setRetry((value) => value + 1); }}>Reload</button>}</div>}
-    <div className="live-todo-panel"><div className="live-todo-panel-top"><div><span>YOUR TASKS</span><h3>All the details, in one place</h3></div><label>Filter<select value={filter} onChange={(e) => setFilter(e.target.value)}><option>All</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></label></div>
-      {loading ? <p role="status">Loading tasks...</p> : error && tasks.length === 0 ? <p>Tasks could not be loaded.</p> : visible.length === 0 ? <div className="live-todo-empty"><strong>{tasks.length ? "No tasks match this filter" : "Your list is clear"}</strong><p>{tasks.length ? "Choose a different filter to see more tasks." : "Add a task to start organizing your work."}</p></div> : <ul className="live-todo-list">{visible.map((task) => <li key={task.id} className={task.status === "Completed" ? "is-completed" : ""}>
-        <label className="live-todo-check"><input type="checkbox" checked={task.status === "Completed"} disabled={busy} onChange={(event) => void setCompleted(task, event.target.checked)} aria-label={`Mark ${task.title} ${task.status === "Completed" ? "pending" : "completed"}`} /></label>
+    <div className="live-todo-panel"><div className="live-todo-panel-top"><div><span>YOUR TASKS</span><h3>All the details, in one place</h3></div><label>Filter<select value={filter} onChange={(e) => { setFilter(e.target.value); setPage(1); }}><option>All</option><option>Pending</option><option>In Progress</option><option>Completed</option></select></label></div>
+      {loading ? <p role="status">Loading tasks...</p> : error && tasks.length === 0 ? <p>Tasks could not be loaded.</p> : visible.length === 0 ? <div className="live-todo-empty"><strong>{tasks.length ? "No tasks match this filter" : "Your list is clear"}</strong><p>{tasks.length ? "Choose a different filter to see more tasks." : "Add a task to start organizing your work."}</p></div> : <ul className="live-todo-list">{pageSlice(visible, taskPage).map((task) => <li key={task.id} className={task.status === "Completed" ? "is-completed" : ""}>
         <div className="live-todo-copy"><strong>{task.title}</strong>{task.description && <p>{task.description}</p>}<div className="live-todo-meta"><span className={`live-todo-priority ${task.priority.toLowerCase()}`}>{task.priority} priority</span><span>{task.status}</span>{task.due_date && <span>Due {task.due_date}</span>}</div></div>
         <div className="live-todo-actions"><button type="button" disabled={busy} onClick={() => openEdit(task)}>Edit</button><button type="button" disabled={busy} onClick={() => void deleteTask(task)}>Delete</button></div>
       </li>)}</ul>}
+      {!loading && <Pagination className="admin-list-pagination" page={taskPage} total={visible.length} onChange={setPage} itemLabel="tasks" />}
     </div>
     {form && <div className="live-todo-backdrop"><div className="live-todo-dialog" role="dialog" aria-modal="true" aria-labelledby="todo-form-title"><div className="live-todo-dialog-header"><div><p>YOUR TASKS</p><h3 id="todo-form-title">{editingId ? "Edit task" : "Add a task"}</h3></div><button type="button" aria-label="Close" disabled={busy} onClick={() => setForm(null)}>×</button></div>
       <form onSubmit={saveTask}><label>Task title<input autoFocus required maxLength={200} placeholder="e.g. Prepare the wedding gallery" value={form.title} onChange={(event) => setForm({ ...form, title: event.target.value })} /></label><label>Description <span>(optional)</span><textarea maxLength={2000} rows={3} placeholder="Add any helpful details" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} /></label><div className="live-todo-form-grid"><label>Due date <span>(optional)</span><input type="date" value={form.due_date} onChange={(event) => setForm({ ...form, due_date: event.target.value })} /></label><label>Priority<select value={form.priority} onChange={(event) => setForm({ ...form, priority: event.target.value as Priority })}><option>Low</option><option>Medium</option><option>High</option></select></label><label>Status<select value={form.status} onChange={(event) => setForm({ ...form, status: event.target.value as TaskStatus })}><option>Pending</option><option>In Progress</option><option>Completed</option></select></label></div>{formError && <p className="live-todo-error" role="alert">{formError}</p>}<div className="live-todo-form-actions"><button type="button" disabled={busy} onClick={() => setForm(null)}>Cancel</button><button type="submit" disabled={busy}>{busy ? "Saving..." : editingId ? "Save changes" : "Add task"}</button></div></form>
