@@ -407,6 +407,13 @@ button {
   transform: translateY(1px);
 }
 
+.auth-signup-notice { margin: 20px 0; padding: 28px; text-align: center; border: 1px solid #e9dcd1; background: #fffaf6; }
+.auth-signup-notice-icon { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 16px; border-radius: 50%; background: #f3e6dc; color: #896149; font-size: 1.35rem; }
+.auth-signup-notice h3 { margin: 0 0 10px; color: #302621; font: 400 1.5rem Georgia, serif; }
+.auth-signup-notice p { color: #77695e; font-size: .85rem; line-height: 1.6; }
+.auth-signup-notice-link { display: inline-flex; justify-content: center; align-items: center; margin-top: 10px; text-decoration: none; }
+.form-message.form-message-error { color: #a32323; background: #fff1f1; border: 1px solid #e9b1b1; }
+.auth-password-hint { display: block; margin-top: 7px; color: #71655c; line-height: 1.5; }
 .form-message {
   border: 1px solid #ded7cf;
   border-radius: 7px;

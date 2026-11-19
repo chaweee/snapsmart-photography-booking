@@ -116,6 +116,8 @@
   font-weight: 400;
 }
 
+.admin-topbar-logout { border: 1px solid #ddcfc3; border-radius: 6px; background: #fff; color: #58463a; padding: 8px 12px; cursor: pointer; font: inherit; font-size: .8rem; }
+.admin-topbar-logout:hover { background: #f7eee7; }
 .admin-profile {
   display: flex;
   align-items: center;

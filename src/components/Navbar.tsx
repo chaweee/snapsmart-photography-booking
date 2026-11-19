@@ -102,6 +102,10 @@ const Navbar: FunctionComponent<NavbarProps> = () => {
         Home
       </NavLink>
 
+      <a href="/#packages" onClick={(event) => handleSectionClick(event, "packages")}>
+        View Packages
+      </a>
+
       <NavLink to="/book" className={getLinkClass} onClick={closeMenu}>
         Book Now
       </NavLink>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import heroImage from "../assets/hero.png";
@@ -15,20 +15,17 @@ function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
+  const [messageIsError, setMessageIsError] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [signupComplete, setSignupComplete] = useState(false);
+  const [signupHasSession, setSignupHasSession] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
 
-  useEffect(() => {
-    if (!signupComplete) return;
-    const timer = window.setTimeout(() => navigate("/", { replace: true }), 2000);
-    return () => window.clearTimeout(timer);
-  }, [signupComplete, navigate]);
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setMessageIsError(true);
 
     const formData = new FormData(event.currentTarget);
 
@@ -42,6 +39,10 @@ function AuthPage() {
     }
     if (!isLogin && (!firstName.trim() || !lastName.trim())) {
       setMessage("Please enter your first and last name.");
+      return;
+    }
+    if (!isLogin && (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password) || !/[^A-Za-z0-9\s]/.test(password))) {
+      setMessage("Password must have at least 8 characters, including an uppercase letter, a lowercase letter, a number, and a special character.");
       return;
     }
     if (!isLogin && password !== confirmPassword) {
@@ -63,16 +64,18 @@ function AuthPage() {
       } else {
         const { data, error } = await supabase.auth.signUp({
           email, password,
-          options: { data: { full_name: `${firstName.trim()} ${lastName.trim()}`, phone }, emailRedirectTo: `${window.location.origin}/login` },
+          options: { data: { full_name: `${firstName.trim()} ${lastName.trim()}`, phone }, emailRedirectTo: `${window.location.origin}/auth/confirmed` },
         });
         if (error) throw error;
         if (data.session) {
           setSignupComplete(true);
+          setSignupHasSession(true);
           setMessage("Signed up successfully! Your account is ready.");
         } else if (data.user && data.user.identities?.length !== 0) {
           setSignupComplete(true);
           setMessage("Signed up successfully! Please check your email to confirm your account before logging in.");
         } else {
+          setSignupComplete(true);
           setMessage("If this email can be registered, check your inbox for a confirmation link. If it is already registered, try logging in instead.");
         }
       }
@@ -186,7 +189,7 @@ function AuthPage() {
             </button>
           </div>
 
-          {signupComplete ? <div className="form-message" role="status">{message}<br />Redirecting to home...</div> : <form className="auth-form" onSubmit={handleSubmit}>
+          {signupComplete ? <div className="auth-signup-notice" role="status"><div className="auth-signup-notice-icon" aria-hidden="true">{signupHasSession ? "✓" : "✉"}</div><h3>{signupHasSession ? "Your account is ready" : "Check your email"}</h3><p>{message}</p>{!signupHasSession && <p>Open the confirmation email and follow the link. Check your spam folder if it doesn't arrive.</p>}<Link className="primary-button auth-signup-notice-link" to={signupHasSession ? "/" : "/login"}>{signupHasSession ? "Continue to home" : "Go to log in"}</Link></div> : <form className="auth-form" onSubmit={handleSubmit}>
             {!isLogin && (
               <>
                 <div className="auth-name-row">
@@ -267,9 +270,9 @@ function AuthPage() {
                     className="forgot-password"
                     type="button"
                     onClick={() =>
-                      setMessage(
+                      (setMessageIsError(false), setMessage(
                         "Password recovery will be connected when Supabase Auth is added.",
-                      )
+                      ))
                     }
                   >
                     Forgot password?
@@ -296,6 +299,7 @@ function AuthPage() {
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
+              {!isLogin && <small className="auth-password-hint">At least 8 characters, including uppercase, lowercase, a number, and a special character.</small>}
             </div>
 
             {!isLogin && (
@@ -336,9 +340,9 @@ function AuthPage() {
                     type="button"
                     className="inline-link"
                     onClick={() =>
-                      setMessage(
+                      (setMessageIsError(false), setMessage(
                         "Terms and Conditions will be implemented before registration goes live.",
-                      )
+                      ))
                     }
                   >
                     Terms &amp; Conditions
@@ -348,9 +352,9 @@ function AuthPage() {
                     type="button"
                     className="inline-link"
                     onClick={() =>
-                      setMessage(
+                      (setMessageIsError(false), setMessage(
                         "The Privacy Policy will be implemented before registration goes live.",
-                      )
+                      ))
                     }
                   >
                     Privacy Policy
@@ -365,7 +369,7 @@ function AuthPage() {
             </button>
 
             {message && (
-              <div className="form-message" role="status">
+              <div className={messageIsError ? "form-message form-message-error" : "form-message"} role={messageIsError ? "alert" : "status"}>
                 {message}
               </div>
             )}

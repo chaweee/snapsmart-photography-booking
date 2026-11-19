@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import "./App.css";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "./components/ScrollToTop";
@@ -27,6 +27,7 @@ const PortfolioManager = lazy(() => import("./admin/PortfolioManager"));
 const TeamDirectory = lazy(() => import("./admin/TeamDirectory"));
 const PublicPortfolio = lazy(() => import("./pages/PublicPortfolio"));
 const BookingPage = lazy(() => import("./pages/BookingPage"));
+const RegistrationConfirmed = lazy(() => import("./pages/RegistrationConfirmed"));
 
 function ProtectedRoute({ children, roles }: { children: ReactNode; roles: string[] }) {
   const { session, role, loading } = useAuth();
@@ -44,6 +45,7 @@ function RequireLogin({ children }: { children: ReactNode }) {
 
 function App() {
   const { session } = useAuth();
+  const { pathname } = useLocation();
 
   return (
     <>
@@ -63,6 +65,7 @@ function App() {
 
         <Route path="/login" element={<AuthPage key="login" />} />
         <Route path="/signup" element={<AuthPage key="signup" />} />
+        <Route path="/auth/confirmed" element={<RegistrationConfirmed />} />
 
         <Route path="/client" element={<ProtectedRoute roles={['client']}><ClientLayout /></ProtectedRoute>}>
           <Route index element={<Navigate to="/client/bookings" replace />} />
@@ -91,7 +94,7 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes></Suspense>
 
-      <ChatAssistant />
+      {!/^\/admin(?:\/|$)/.test(pathname) && <ChatAssistant />}
 
     </>
   );

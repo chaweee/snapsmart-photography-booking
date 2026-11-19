@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import AdminNotificationBell from "./AdminNotificationBell";
 import "./Admin.css";
@@ -86,10 +86,6 @@ function AdminLayout() {
             </NavLink>
           ))}
         </nav>
-        <div className="admin-session-actions">
-          <Link to="/">View website</Link>
-          <button type="button" onClick={handleLogout}>Log out</button>
-        </div>
       </aside>
 
       <div className="admin-content-area">
@@ -105,6 +101,7 @@ function AdminLayout() {
               <span>Admin</span>
               <div>A</div>
             </div>
+            <button className="admin-topbar-logout" type="button" onClick={handleLogout}>Log out</button>
           </div>
         </header>
 

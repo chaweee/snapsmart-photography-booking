@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import heroImage from "../assets/hero.png";
+import PublicPackages from "../components/PublicPackages";
 
 interface HomePageProps {
   isLoggedIn: boolean;
@@ -121,73 +122,12 @@ function HomePage({ isLoggedIn }: HomePageProps) {
 
               <div className="section-heading-copy">
                 <p>
-                  Choose the photography service that best fits your occasion.
-                  Full package details and availability will be available
-                  through SNAPSMART.
+                  Explore our photography packages, prices, and inclusions before booking.
                 </p>
               </div>
             </div>
 
-            <div className="package-grid">
-              <article className="package-card package-card-featured">
-                <div className="package-number">01</div>
-
-                <div className="package-content">
-                  <p className="package-label">TIMELESS CELEBRATIONS</p>
-                  <h3>Wedding Photography</h3>
-
-                  <p>
-                    Thoughtful coverage for one of life's biggest chapters,
-                    from the quiet moments to the celebration itself.
-                  </p>
-
-                  <Link to={bookingDestination}>
-                    View booking options <span>→</span>
-                  </Link>
-                </div>
-              </article>
-
-              <article className="package-card">
-                <div className="package-number">02</div>
-
-                <div className="package-content">
-                  <p className="package-label">MILESTONES</p>
-                  <h3>Birthdays &amp; Debuts</h3>
-
-                  <p>
-                    Capture the people, details, and energy that make milestone
-                    celebrations worth remembering.
-                  </p>
-
-                  <Link to={bookingDestination}>
-                    View booking options <span>→</span>
-                  </Link>
-                </div>
-              </article>
-
-              <article className="package-card">
-                <div className="package-number">03</div>
-
-                <div className="package-content">
-                  <p className="package-label">MEANINGFUL OCCASIONS</p>
-                  <h3>Special Events</h3>
-
-                  <p>
-                    Photography for christenings, family celebrations, and
-                    other meaningful occasions.
-                  </p>
-
-                  <Link to={bookingDestination}>
-                    View booking options <span>→</span>
-                  </Link>
-                </div>
-              </article>
-            </div>
-
-            <p className="package-note">
-              Actual photography packages, inclusions, and pricing will be
-              managed by Toni Photography through the SNAPSMART admin system.
-            </p>
+            <PublicPackages isLoggedIn={isLoggedIn} />
           </div>
         </section>
 
