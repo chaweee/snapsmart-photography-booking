@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../lib/supabase";
+import { useToastMessage } from "../lib/toast";
 import "../components/LiveRecords.css";
 
 type Booking = { id: string; client_name: string; event_type: string; other_event_type: string | null; event_date: string; is_test: boolean; package_snapshot: { requires_videographer?: boolean } | null; packages: { requires_videographer: boolean } | null };
@@ -31,6 +32,8 @@ export default function BookingTeamAssignments() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  // Success messages are shown as toasts (see components/ToastProvider).
+  useToastMessage(notice, setNotice, "success");
   const [retry, setRetry] = useState(0);
   const [scheduleRevision, setScheduleRevision] = useState(0);
   const booking = bookings.find((item) => item.id === bookingId);
@@ -103,7 +106,7 @@ export default function BookingTeamAssignments() {
 
   const currentAssignments = assignments.filter((item) => item.booking_id === bookingId);
   return <section className="live-records assignments-panel"><header><p>TEAM SCHEDULING</p><h2>Assign team</h2><span>Select a confirmed booking and check the team's assignments for that date.</span></header>
-    {error && <p role="alert">{error} <button type="button" onClick={() => { setLoading(true); setRetry((value) => value + 1); }}>Reload</button></p>}{notice && <p role="status">{notice}</p>}
+    {error && <p role="alert">{error} <button type="button" onClick={() => { setLoading(true); setRetry((value) => value + 1); }}>Reload</button></p>}
     {loading ? <p>Loading team assignments...</p> : <><form className="assignments-form" onSubmit={assign}><label>Confirmed booking<select required disabled={busy} value={bookingId} onChange={(event) => { setBookingId(event.target.value); setMemberId(""); setScheduleDate(""); setScheduleError(""); setScheduleRevision((value) => value + 1); }}><option value="">Select booking</option>{bookings.map((item) => <option key={item.id} value={item.id}>{item.is_test ? "[TEST] " : ""}{item.client_name} · {item.other_event_type || item.event_type} · {item.event_date} · {item.id.slice(0, 8)}</option>)}</select></label><label>Team member<select required disabled={busy || !scheduleReady} value={memberId} onChange={(event) => setMemberId(event.target.value)}><option value="">{!selectedDate ? "Choose a booking first" : !scheduleReady ? "Checking assignments..." : "Select photographer or videographer"}</option>{scheduleReady && eligibleMembers.map((member) => { const assigned = assignments.filter((item) => item.team_member_id === member.id); const onThisBooking = assigned.some((item) => item.booking_id === bookingId); const photographerTaken = member.role === "photographer" && assignments.some((item) => item.booking_id === bookingId && item.assignment_role === "photographer"); const others = assigned.filter((item) => item.booking_id !== bookingId).length; return <option key={member.id} value={member.id} disabled={onThisBooking || photographerTaken}>{member.full_name || member.id} · {member.role} · {onThisBooking ? "Already assigned here" : photographerTaken ? "Photographer already assigned" : others ? `${others} other event(s) on this date` : "No assigned events on this date"}</option>; })}</select></label><button type="submit" disabled={busy || !bookingId || !memberId || !scheduleReady}>Assign member</button></form>
       {booking && needsVideographer == null && <p className="assignment-package-note">Videographer requirement is unavailable for this booking; check its package settings.</p>}
       {selectedDate && <div className="assignment-availability"><strong>Schedule for {selectedDate}</strong>{scheduleError ? <p role="alert">Could not check assignments: {scheduleError} <button type="button" onClick={() => setScheduleRevision((value) => value + 1)}>Retry</button></p> : !scheduleReady ? <p>Checking team assignments...</p> : <><p>Based on saved event assignments only; personal availability and leave are not tracked. Confirm availability with the team member.</p><div className="assignment-availability-grid">{eligibleMembers.length ? eligibleMembers.map((member) => { const events = assignments.filter((item) => item.team_member_id === member.id); return <div key={member.id}><strong>{member.full_name || member.id}</strong><span>{member.role}</span><small className={events.length ? "assigned" : "clear"}>{events.length ? `${events.length} assigned event(s)` : "No assigned events"}</small>{events.map((item) => <p key={`${item.booking_id}-${item.assignment_role}`}>{item.bookings.is_test ? "TEST · " : ""}{item.bookings.other_event_type || item.bookings.event_type} · {item.bookings.client_name}{item.booking_id === bookingId ? " (this booking)" : ""}</p>)}</div>; }) : <p>No eligible team members found.</p>}</div></>}</div>}

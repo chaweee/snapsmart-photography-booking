@@ -5,11 +5,12 @@ import "./index.css";
 import "./about-logo.css";
 import App from "./App";
 import { AuthProvider } from "./auth/AuthProvider";
+import ToastProvider from "./components/ToastProvider";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider><App /></AuthProvider>
+      <AuthProvider><ToastProvider><App /></ToastProvider></AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 );

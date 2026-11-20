@@ -1,0 +1,57 @@
+/* Dashboard "Booking status" and "Package demand" panels. */
+.breakdown-panel { display: flex; flex-direction: column; }
+.breakdown-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.breakdown-eyebrow { display: block; margin-bottom: 6px; color: #987b65; font-size: .68rem; font-weight: 800; letter-spacing: .14em; }
+.breakdown-heading h3 { margin: 0; font: 400 1.45rem Georgia, serif; }
+.breakdown-period { flex-shrink: 0; border: 1px solid #e5dbd1; padding: 5px 10px; color: #6b5d52; font-size: .75rem; white-space: nowrap; }
+.breakdown-count { flex-shrink: 0; padding-top: 4px; color: #8a7c70; font-size: .8rem; }
+
+/* Booking status */
+.status-overview { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+.status-donut { flex-shrink: 0; width: 150px; height: 150px; }
+.status-donut circle { transition: stroke-dasharray .4s ease; }
+.status-donut-total { fill: #29221e; font: 400 9px Georgia, serif; }
+.status-donut-label { fill: #8a7c70; font: 400 2.6px Georgia, serif; letter-spacing: .2px; }
+.status-legend { display: grid; flex: 1; gap: 9px; min-width: 180px; margin: 0; padding: 0; list-style: none; font-size: .85rem; }
+.status-legend li { display: flex; align-items: center; gap: 10px; color: #3d332c; }
+.status-legend li.is-empty { color: #b3a69b; }
+.status-swatch { flex-shrink: 0; width: 10px; height: 10px; }
+.status-legend li.is-empty .status-swatch { opacity: .45; }
+.status-name { flex: 1; min-width: 0; }
+.status-legend strong { font-weight: 700; }
+.status-share { width: 40px; color: #8a7c70; text-align: right; }
+.status-legend li.is-empty .status-share { color: inherit; }
+.breakdown-note { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: auto; border-top: 1px solid #f0e9e3; padding-top: 12px; color: #8a7c70; font-size: .8rem; }
+.status-overview + .breakdown-note { margin-top: 20px; }
+.breakdown-note > span { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; color: #fff; background: #5f7d55; font: 700 .65rem Arial, sans-serif; }
+.breakdown-note.needs-action > span { background: #d9a441; }
+.breakdown-note a { color: #725641; font-weight: 700; }
+
+/* Package demand */
+.package-top { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; border: 1px solid #eadccc; padding: 12px 14px; background: #f8f2ec; }
+.package-top-icon { display: grid; flex-shrink: 0; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: #fff; background: #29221e; font-size: 1rem; }
+.package-top-name { flex: 1; min-width: 0; }
+.package-top-name span, .package-top-count span { display: block; color: #987b65; font-size: .68rem; letter-spacing: .12em; }
+.package-top-name strong { display: block; overflow: hidden; font: 400 1.05rem Georgia, serif; white-space: nowrap; text-overflow: ellipsis; }
+.package-top-count { flex-shrink: 0; text-align: right; }
+.package-top-count strong { display: block; font: 400 1.5rem Georgia, serif; line-height: 1.1; }
+.package-top-count span { color: #8a7c70; letter-spacing: normal; }
+.package-rank { display: grid; gap: 13px; margin: 0; padding: 0; list-style: none; font-size: .85rem; }
+.package-rank-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.package-rank-number { width: 16px; flex-shrink: 0; color: #b3a69b; }
+.package-rank-name { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.package-rank-row strong { font-weight: 700; }
+.package-rank-share { width: 36px; color: #8a7c70; text-align: right; }
+.package-rank-track { height: 6px; margin-left: 26px; background: #efe8e1; }
+.package-rank-bar { height: 100%; background: #c9b19d; transition: width .4s ease; }
+.package-rank-bar.is-second { background: #a58870; }
+
+@media (max-width: 650px) {
+  .breakdown-heading h3 { font-size: 1.25rem; }
+  .status-overview { justify-content: center; gap: 18px; }
+  .status-donut { width: 130px; height: 130px; }
+  .status-legend { min-width: 100%; }
+}
+@media print {
+  .breakdown-note a { display: none; }
+}

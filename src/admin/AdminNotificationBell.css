@@ -20,3 +20,10 @@
 .admin-topbar .admin-bell-empty { margin: 0; padding: 22px 18px; color: #897b70; font-size: .8rem; font-weight: 400; letter-spacing: normal; text-transform: none; }
 .admin-bell-view-all { display: block; padding: 15px 18px; color: #725641; font-size: .76rem; font-weight: 800; text-align: center; text-decoration: none; }
 @media (max-width: 500px) { .admin-topbar-actions { gap: 10px; } .admin-bell-panel { right: -60px; } }
+
+/* The whole notification is clickable and opens its page. */
+.admin-bell-list li { padding: 0; }
+.admin-bell-item-open { display: grid; gap: 0; width: 100%; border: 0; padding: 14px 18px 12px; color: inherit; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.admin-bell-item-open:hover, .admin-bell-item-open:focus-visible { background: #f6ede4; }
+.admin-bell-item-message { display: block; margin: 7px 0; color: #766a60; font-size: .75rem; line-height: 1.5; }
+.admin-bell-list li .admin-bell-item-actions { margin: 0; padding: 0 18px 12px; }

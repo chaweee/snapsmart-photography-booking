@@ -5,18 +5,21 @@ import {
   useRef,
   useState,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { formatPeso, type PhotographyPackage } from "../data/packages";
 import "./BookingPage.css";
 import { useAuth } from "../auth/authContext";
 import BookingClientInformation from "./BookingClientInformation";
 import { supabase } from "../lib/supabase";
+import { EMAIL_ERROR, filterNameInput, findNameError, isValidEmail, isValidPhone, nameInputProps } from "../lib/validation";
 
 function BookingPage() {
   const { session, role, loading } = useAuth();
   const isClientLoggedIn = !!session;
-  const [selectedPackageId, setSelectedPackageId] = useState("");
+  const [searchParams] = useSearchParams();
+  // "Book now" on a landing page package card links here as /book?package=<id>.
+  const [selectedPackageId, setSelectedPackageId] = useState(() => searchParams.get("package") ?? "");
   const [photographyPackages, setPhotographyPackages] = useState<PhotographyPackage[]>([]);
   const [packagesLoading, setPackagesLoading] = useState(true);
   const [packagesError, setPackagesError] = useState("");
@@ -70,6 +73,15 @@ function BookingPage() {
         setMessage("Choose a JPEG, PNG, or PDF payment proof up to 5 MB."); return;
       }
       if (!selectedPackage) { setMessage("Select an active package."); return; }
+      const nameError = findNameError([
+        ["Full name", String(data.get("clientName") ?? "")],
+        ...(eventType === "Wedding"
+          ? [["Bride's full name", String(data.get("brideName") ?? "")], ["Groom's full name", String(data.get("groomName") ?? "")]] as Array<[string, string]>
+          : []),
+      ]);
+      if (nameError) { setMessage(nameError); return; }
+      if (!isValidEmail(String(data.get("email") ?? ""))) { setMessage(EMAIL_ERROR); return; }
+      if (!isValidPhone(String(data.get("phone") ?? "").trim())) { setMessage("Phone number must contain exactly 11 digits."); return; }
       const start = String(data.get("startTime") ?? "");
       if (!start) { setMessage("Please choose a start time."); return; }
     }
@@ -267,7 +279,8 @@ function BookingPage() {
                         <span>Bride&apos;s Full Name</span>
                         <input
                           name="brideName"
-                          type="text"
+                          {...nameInputProps}
+                          onInput={filterNameInput}
                           placeholder="Enter bride's full name"
                           required
                         />
@@ -277,7 +290,8 @@ function BookingPage() {
                         <span>Groom&apos;s Full Name</span>
                         <input
                           name="groomName"
-                          type="text"
+                          {...nameInputProps}
+                          onInput={filterNameInput}
                           placeholder="Enter groom's full name"
                           required
                         />

@@ -1,0 +1,14 @@
+.confirm-backdrop { position: fixed; inset: 0; z-index: 6000; display: grid; place-items: center; padding: 18px; background: rgb(20 16 14 / 50%); animation: confirm-fade .18s ease; }
+.confirm-dialog { width: min(400px, 100%); border-radius: 18px; padding: 24px; color: #29221e; background: #fffdfb; box-shadow: 0 24px 70px rgb(41 34 30 / 28%); font-family: Georgia, "Times New Roman", serif; animation: confirm-pop .2s ease; }
+.confirm-dialog h2 { margin: 0 0 8px; font-size: 1.35rem; font-weight: 400; }
+.confirm-dialog p { margin: 0; color: #6b5d52; font-size: .92rem; line-height: 1.6; }
+.confirm-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 22px; }
+.confirm-actions button { min-height: 42px; border: 1px solid #29221e; border-radius: 10px; padding: 0 18px; cursor: pointer; font: 700 .85rem Georgia, "Times New Roman", serif; transition: background-color .18s ease, color .18s ease; }
+.confirm-cancel { color: #29221e; background: transparent; }
+.confirm-cancel:hover:not(:disabled) { background: #f4ede6; }
+.confirm-ok { color: #fff; background: #29221e; }
+.confirm-ok:hover:not(:disabled) { background: #4a3a30; }
+.confirm-actions button:disabled { opacity: .55; cursor: not-allowed; }
+@keyframes confirm-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes confirm-pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+@media (max-width: 420px) { .confirm-actions { flex-direction: column-reverse; } .confirm-actions button { width: 100%; } }

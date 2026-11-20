@@ -6,6 +6,12 @@
 .live-dashboard-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
 .live-dashboard-controls label { display: grid; gap: 6px; color: #89786c; font-size: .7rem; font-weight: 700; }
 .live-dashboard-controls input { min-height: 42px; border: 1px solid #dfd4ca; padding: 0 10px; background: white; font: inherit; }
+/* When no month is picked (all dates), hide the browser's "--------- ----" and show "All dates" instead. */
+.live-month-field { position: relative; display: block; }
+.live-month-field.is-all-dates input { color: transparent; }
+.live-month-field.is-all-dates input:focus { color: inherit; }
+.live-month-field.is-all-dates::before { content: attr(data-empty-label); position: absolute; top: 50%; left: 9px; transform: translateY(-50%); color: #302821; font-weight: 700; pointer-events: none; }
+.live-month-field.is-all-dates:focus-within::before { content: none; }
 .live-dashboard-controls button { min-height: 42px; border: 1px solid #302821; padding: 0 16px; color: #302821; background: white; cursor: pointer; font-size: .75rem; font-weight: 700; }
 .live-dashboard-controls button:last-child { color: white; background: #302821; }
 .live-dashboard-controls button:disabled { opacity: .45; cursor: not-allowed; }
@@ -17,7 +23,7 @@
 .live-dashboard-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
 .live-dashboard-cards article, .live-dashboard-panel { border: 1px solid #e9e1da; padding: 22px; background: #fff; }
 .live-dashboard-cards article { border-top: 3px solid #a58870; }
-.live-dashboard-cards span { color: #88796e; font-size: .72rem; font-weight: 700; }
+.live-dashboard-cards span { color: #5e5148; font-size: .9rem; font-weight: 700; }
 .live-dashboard-cards strong { display: block; margin: 12px 0 7px; overflow-wrap: anywhere; color: #302821; font-family: Georgia, serif; font-size: 1.9rem; font-weight: 400; }
 .live-dashboard-cards p, .live-empty { margin: 0; color: #897b70; font-size: .76rem; line-height: 1.6; }
 .live-dashboard-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
@@ -50,4 +56,80 @@
   .live-dashboard-grid { display: grid; grid-template-columns: repeat(2, 1fr); }
   .live-dashboard-panel, .live-dashboard-cards article { break-inside: avoid; }
   .live-table-wrap { overflow: visible; }
+}
+
+/* Scheduled bookings pagination: hide rows on other pages on screen, print them all. */
+.live-row-offpage { display: none; }
+@media print { .live-row-offpage { display: table-row; } }
+
+/* Report period sits inline, to the left of the Event month controls (and still prints). */
+.live-dashboard-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: flex-end; gap: 14px; }
+.live-period.live-period-inline { display: grid; gap: 4px; min-height: 42px; padding: 9px 16px; box-sizing: border-box; }
+.live-period.live-period-inline strong { font-size: 1.05rem; line-height: 1.2; }
+@media (max-width: 650px) { .live-dashboard-toolbar { justify-content: flex-start; width: 100%; } }
+
+/* Report period, Event month, Export CSV and Print summary share one size. */
+.live-dashboard-toolbar { align-items: flex-end; }
+.live-dashboard-toolbar .live-period.live-period-inline,
+.live-dashboard-controls .live-month-field,
+.live-dashboard-controls input,
+.live-dashboard-controls button {
+  box-sizing: border-box;
+  width: 136px;
+  height: 44px;
+  min-height: 44px;
+}
+.live-dashboard-toolbar .live-period.live-period-inline { align-content: center; gap: 1px; padding: 0 10px; }
+.live-dashboard-controls button { padding: 0 10px; }
+.live-dashboard-controls input { padding: 0 8px; }
+.live-dashboard-toolbar .live-period.live-period-inline span { font-size: .55rem; }
+.live-dashboard-toolbar .live-period.live-period-inline strong { overflow: hidden; font-size: .88rem; white-space: nowrap; text-overflow: ellipsis; }
+.live-dashboard-controls input { width: 100%; }
+
+/* "Report period" label sits on the same line as "Event month", boxes line up below. */
+.live-period-field { display: grid; gap: 6px; }
+.live-period-label { color: #89786c; font-size: .7rem; font-weight: 700; }
+/* Same text style as "All dates" inside the Event month box. */
+.live-dashboard-toolbar .live-period.live-period-inline strong { color: #302821; font-family: inherit; font-size: .7rem; font-weight: 700; }
+/* Booked value amount: same size as the KPI card numbers above it. */
+.live-panel-heading .live-booked-value { color: #302821; font-family: Georgia, serif; font-size: 1.9rem; font-weight: 400; line-height: 1.1; white-space: nowrap; }
+
+/* The report period isn't shown on screen (the Event month box says it), but stays on the printout. */
+.live-print-only { display: none; }
+@media print { .live-print-only { display: block; margin-top: 8px; } }
+
+/* Keep every dashboard section inside the screen width: without an explicit
+   column, the page grid grew to fit the bookings table and pushed the KPI cards
+   past the right edge on phones. */
+.live-dashboard { grid-template-columns: minmax(0, 1fr); }
+.live-dashboard > *, .live-dashboard-grid > *, .live-dashboard-cards > * { min-width: 0; }
+
+/* ---------- Mobile layout ---------- */
+@media (max-width: 650px) {
+  .live-dashboard { gap: 16px; }
+  .live-dashboard-header { gap: 14px; }
+
+  /* Filters: month box full width, Export + Print side by side below it. */
+  .live-dashboard-toolbar,
+  .live-dashboard-controls { width: 100%; }
+  .live-dashboard-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .live-dashboard-controls label { grid-column: 1 / -1; }
+  .live-dashboard-controls .live-month-field,
+  .live-dashboard-controls input,
+  .live-dashboard-controls button { width: 100%; }
+
+  /* KPI cards: compact 2 x 2 grid. */
+  .live-dashboard-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .live-dashboard-cards article { padding: 14px; }
+  .live-dashboard-cards span { font-size: .78rem; }
+  .live-dashboard-cards strong { margin: 8px 0 4px; font-size: 1.35rem; }
+  .live-dashboard-cards p { font-size: .7rem; line-height: 1.4; }
+
+  .live-dashboard-panel { padding: 16px; }
+  .live-panel-heading { flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .live-panel-heading .live-booked-value { font-size: 1.5rem; }
+
+  /* Bookings table scrolls sideways inside its card instead of widening the page. */
+  .live-table-wrap { margin: 0 -16px; padding: 0 16px; }
+  .live-table-wrap table { min-width: 520px; }
 }

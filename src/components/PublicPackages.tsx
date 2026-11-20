@@ -24,9 +24,11 @@ export default function PublicPackages({ isLoggedIn }: { isLoggedIn: boolean }) 
   if (error) return <p role="alert">Unable to load packages right now. Please try again later or contact the studio.</p>;
   if (!packages.length) return <p>No packages are currently available. Please contact the studio.</p>;
   return <><div className="public-package-grid">{packages.map((item) => <article className="public-package-card" key={item.id}>
-    <header className="public-package-header"><div><span className="public-package-eyebrow">PHOTOGRAPHY PACKAGE</span><h3>{item.name}</h3><p className="public-package-subtitle">{item.subtitle}</p></div><strong className="public-package-price">{peso(Number(item.price))}</strong></header>
+    <header className="public-package-header"><div><span className="public-package-eyebrow">PHOTOGRAPHY PACKAGE</span><h3 title={item.name}>{item.name}</h3><p className="public-package-subtitle" title={item.subtitle}>{item.subtitle}</p></div><strong className="public-package-price">{peso(Number(item.price))}</strong></header>
     <div className="public-package-body"><p className="public-package-inclusions-label">INCLUSIONS</p>
     <ul>{Array.isArray(item.inclusions) && item.inclusions.map((inclusion, inclusionIndex) => <li key={inclusionIndex}>{inclusion}</li>)}</ul>
-    <p className="public-package-deposit">Down payment: <strong>{peso(Number(item.required_down_payment))}</strong></p></div>
-  </article>)}</div><div className="public-package-action"><Link className="button button-dark" to={isLoggedIn ? "/book" : "/login"}>{isLoggedIn ? "Book a session" : "Log in to book"} <span aria-hidden="true">→</span></Link><p>Select your package on the booking page.</p></div></>;
+    <p className="public-package-deposit">Down payment: <strong>{peso(Number(item.required_down_payment))}</strong></p>
+    {/* Logged out → login first, then come back to the booking form with this package selected. */}
+    <Link className="button button-dark public-package-book" to={isLoggedIn ? `/book?package=${encodeURIComponent(item.id)}` : "/login"} state={isLoggedIn ? undefined : { from: `/book?package=${encodeURIComponent(item.id)}` }} aria-label={`Book now: ${item.name}`}>Book now <span aria-hidden="true">→</span></Link></div>
+  </article>)}</div></>;
 }

@@ -880,3 +880,17 @@
   height: auto;
   object-fit: contain;
 }
+
+/* Desktop: Step 1 (packages) has its own scroll. With the cursor over the package
+   list only the list scrolls; over the form, the page (Steps 2+) scrolls. */
+@media (min-width: 1021px) {
+  .booking-package-panel {
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #cdbfb3 transparent;
+  }
+  .booking-package-panel::-webkit-scrollbar { width: 6px; }
+  .booking-package-panel::-webkit-scrollbar-thumb { border-radius: 99px; background: #cdbfb3; }
+}

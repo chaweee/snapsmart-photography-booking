@@ -4,27 +4,29 @@ import { lazy, Suspense } from "react";
 import ScrollToTop from "./components/ScrollToTop";
 import HomePage from "./pages/HomePage";
 import ChatAssistant from "./components/ChatAssistant";
+import IdleLogout from "./components/IdleLogout";
 import { useAuth } from "./auth/authContext";
 import type { ReactNode } from "react";
+import { adminPageLoaders } from "./lib/adminPageLoaders";
 
-const AdminDashboard = lazy(() => import("./admin/LiveDashboard"));
-const AdminGalleries = lazy(() => import("./admin/PrivateGalleries"));
+const AdminDashboard = lazy(adminPageLoaders.dashboard);
+const AdminGalleries = lazy(adminPageLoaders.galleries);
 const AdminLayout = lazy(() => import("./admin/AdminLayout"));
-const AdminPackages = lazy(() => import("./admin/AdminPackages"));
-const LiveTodoList = lazy(() => import("./admin/LiveTodoList"));
-const PaymentProofs = lazy(() => import("./admin/PaymentProofs"));
-const AdminWalkInBooking = lazy(() => import("./admin/AdminWalkInBooking"));
-const BookingTeamAssignments = lazy(() => import("./admin/BookingTeamAssignments"));
+const AdminPackages = lazy(adminPageLoaders.packages);
+const LiveTodoList = lazy(adminPageLoaders.todoList);
+const PaymentProofs = lazy(adminPageLoaders.payments);
+const AdminWalkInBooking = lazy(adminPageLoaders.walkIn);
+const BookingTeamAssignments = lazy(adminPageLoaders.teamAssignments);
 const ClientGalleries = lazy(() => import("./client/PrivateGalleries"));
 const ClientLayout = lazy(() => import("./client/ClientLayout"));
-const LiveRecords = lazy(() => import("./components/LiveRecords"));
+const LiveRecords = lazy(adminPageLoaders.records);
 const FeatureUnavailable = lazy(() => import("./components/FeatureUnavailable"));
-const BookingViews = lazy(() => import("./components/BookingViews"));
-const NotificationsPage = lazy(() => import("./components/NotificationsPage"));
+const BookingViews = lazy(adminPageLoaders.bookingViews);
+const NotificationsPage = lazy(adminPageLoaders.notifications);
 const TeamPortal = lazy(() => import("./photographer/TeamPortal"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
-const PortfolioManager = lazy(() => import("./admin/PortfolioManager"));
-const TeamDirectory = lazy(() => import("./admin/TeamDirectory"));
+const PortfolioManager = lazy(adminPageLoaders.portfolio);
+const TeamDirectory = lazy(adminPageLoaders.teamDirectory);
 const PublicPortfolio = lazy(() => import("./pages/PublicPortfolio"));
 const BookingPage = lazy(() => import("./pages/BookingPage"));
 const RegistrationConfirmed = lazy(() => import("./pages/RegistrationConfirmed"));
@@ -50,6 +52,8 @@ function App() {
   return (
     <>
       <ScrollToTop />
+      {/* Signed-in users are logged out after 15 minutes of inactivity. */}
+      <IdleLogout />
 
       <Suspense fallback={<p role="status">Loading page...</p>}><Routes>
         <Route path="/" element={<HomePage isLoggedIn={!!session} />} />
@@ -94,7 +98,8 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes></Suspense>
 
-      {!/^\/admin(?:\/|$)/.test(pathname) && <ChatAssistant />}
+      {/* The booking assistant is for clients and visitors: not on the admin or team portals, and not over the log in / sign up forms. */}
+      {!/^\/(?:admin|photographer|login|signup|auth)(?:\/|$)/.test(pathname) && <ChatAssistant />}
 
     </>
   );

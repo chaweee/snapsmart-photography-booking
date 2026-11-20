@@ -35,3 +35,5 @@
 .client-directory-state p { margin-bottom: 0; }
 .client-directory-state button { border: 0; color: #725641; background: none; cursor: pointer; text-decoration: underline; }
 @media (max-width: 650px) { .client-directory-heading { align-items: start; flex-direction: column; } .client-directory-total { min-width: 0; } .client-directory-toolbar { padding: 20px; } .client-directory-search { width: 100%; } .client-directory-list-heading { display: none; } .client-directory-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 18px 20px; } .client-directory-person { grid-column: 1 / -1; } .client-directory-cell small { display: block; margin-bottom: 4px; color: #a18e80; font-size: .6rem; font-weight: 800; letter-spacing: .08em; } }
+
+.client-directory-pagination { margin-top: 0; }

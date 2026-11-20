@@ -25,8 +25,9 @@
 }
 
 .admin-brand-mark {
-  width: 44px;
-  height: 44px;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
   border: 1px solid rgba(255, 255, 255, 0.18);
@@ -34,12 +35,12 @@
   color: #29221e;
   background: #fff;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.25rem;
+  font-size: 1.45rem;
 }
 
 .admin-brand strong {
   display: block;
-  font-size: 0.9rem;
+  font-size: 1.05rem;
   letter-spacing: 0.12em;
 }
 
@@ -47,17 +48,17 @@
   display: block;
   margin-top: 4px;
   color: rgba(255, 255, 255, 0.55);
-  font-size: 0.72rem;
+  font-size: 0.8rem;
 }
 
 .admin-nav {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 6px;
 }
 
 .admin-nav-link {
-  min-height: 44px;
+  min-height: 43px;
   display: flex;
   align-items: center;
   border-radius: 14px;
@@ -98,6 +99,10 @@
   background: rgba(251, 250, 248, 0.9);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
+  /* backdrop-filter makes the top bar its own stacking layer, so the notification
+     dropdown inside it can only sit above page content if the bar itself does. */
+  position: relative;
+  z-index: 50;
 }
 
 .admin-topbar p {
@@ -112,7 +117,7 @@
 .admin-topbar h1 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.55rem;
+  font-size: 1.2rem;
   font-weight: 400;
 }
 
@@ -184,7 +189,14 @@
 }
 
 .dashboard-actions button,
+.dashboard-actions a,
 .admin-panel-heading button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: color 0.18s ease, background-color 0.18s ease;
   min-height: 42px;
   border: 1px solid #29221e;
   padding: 0 14px;
@@ -195,7 +207,13 @@
   font-weight: 800;
 }
 
+.dashboard-actions a:visited {
+  color: #29221e;
+}
+
 .dashboard-actions button:hover,
+.dashboard-actions a:hover,
+.dashboard-actions a:focus-visible,
 .admin-panel-heading button:hover {
   color: #fff;
   background: #29221e;
@@ -5232,3 +5250,286 @@
 .walkin-cash-review span { color: #8b7461; font-size: .7rem; font-weight: 700; }
 .walkin-cash-review strong { color: #3c3028; font-size: .9rem; }
 @media (max-width: 480px) { .walkin-cash-review { grid-template-columns: 1fr; } }
+
+/* ---------------------------------------------------------------------------
+   Consistent page titles across every admin page (Dashboard, Bookings, Walk-In,
+   Calendar, Payments, Clients, Galleries, Portfolio, Packages, Team Members,
+   To-Do List, Notifications). One shared size for every page title.
+   !important because several pages set their own title size with more
+   specific or later selectors (some already use !important).
+   ------------------------------------------------------------------------- */
+.admin-main :is(
+  .live-dashboard-header,
+  .booking-view-header,
+  .admin-page-heading,
+  .admin-page-header,
+  .payments-header,
+  .client-directory-heading,
+  .team-directory-header,
+  .live-todo-header,
+  .notifications-page-header
+) h2,
+/* Any page whose first element is its title (e.g. a loading or empty state). */
+.admin-main > :is(div, section) > h2:first-child {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem) !important;
+  font-weight: 400 !important;
+  line-height: 1.1 !important;
+  letter-spacing: normal !important;
+}
+
+/* Small label above every admin page title (e.g. "BUSINESS OVERVIEW"): one style everywhere. */
+.admin-main :is(
+  .live-dashboard-header,
+  .booking-view-header,
+  .admin-page-heading,
+  .admin-page-header,
+  .payments-header,
+  .client-directory-heading,
+  .team-directory-header,
+  .live-todo-header,
+  .notifications-page-header
+) > div > p:first-child {
+  margin: 0 0 8px !important;
+  color: #987b65 !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.14em !important;
+  line-height: 1.4 !important;
+  text-transform: uppercase !important;
+}
+
+/* Admin package cards: fixed-height dark header so every card lines up,
+   whatever the package name length. Height = padding (48px) + gaps (18px)
+   + id line + name (2 lines) + subtitle (2 lines). Longer text ends in "…". */
+@media (min-width: 721px) {
+  .admin-package-card-top { box-sizing: border-box; height: calc(66px + 0.84rem + 3.47rem + 2.34rem); overflow: hidden; }
+  .admin-package-card-top > div { min-width: 0; }
+  .admin-package-card-top span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .admin-package-card-top h3,
+  .admin-package-card-top p { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; }
+}
+
+/* Down payment always sits at the bottom of the package card, just above the Edit button. */
+.admin-package-grid { align-items: stretch; }
+.admin-package-card .admin-package-inclusions { display: flex; flex: 1; flex-direction: column; }
+.admin-package-card .admin-package-deposit { margin-top: auto; padding-top: 16px; }
+
+/* Page header action buttons ("View bookings", "Open calendar", "+ Add package",
+   "+ Add team member", "+ Add task"): one style for all, matching Export CSV.
+   !important because each page had its own button styles. */
+.admin-main .admin-action-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 42px !important;
+  border: 1px solid #29221e !important;
+  border-radius: 0 !important;
+  padding: 0 16px !important;
+  color: #29221e !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-decoration: none !important;
+  opacity: 1 !important;
+  transition: color 0.18s ease, background-color 0.18s ease !important;
+}
+.admin-main .admin-action-button:visited { color: #29221e !important; }
+.admin-main .admin-action-button:hover:not(:disabled),
+.admin-main .admin-action-button:focus-visible { color: #fff !important; background: #29221e !important; }
+.admin-main .admin-action-button:disabled { opacity: 0.5 !important; cursor: not-allowed; }
+
+/* ---------------------------------------------------------------------------
+   Mobile sidebar: a slide-in drawer from the left, opened with the menu button
+   in the top bar (instead of the full nav stacked above the page).
+   ------------------------------------------------------------------------- */
+.admin-menu-button,
+.admin-drawer-close,
+.admin-drawer-logout,
+.admin-drawer-backdrop { display: none; }
+
+@media (max-width: 860px) {
+  .admin-layout { grid-template-columns: 1fr; }
+
+  .admin-sidebar {
+    position: fixed !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    width: min(300px, 84vw);
+    height: 100dvh !important;
+    border-radius: 0 18px 18px 0;
+    padding: 22px 18px 18px;
+    box-shadow: 0 20px 60px rgb(0 0 0 / 28%);
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+    visibility: hidden;
+  }
+  .admin-sidebar.open { transform: none; visibility: visible; }
+
+  .admin-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 150;
+    display: block;
+    background: rgb(20 16 14 / 45%);
+    animation: admin-drawer-fade 0.2s ease;
+  }
+  @keyframes admin-drawer-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .admin-drawer-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    color: rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  .admin-sidebar .admin-brand { margin-bottom: 22px; padding-right: 40px; }
+  .admin-nav { display: flex !important; flex-direction: column; }
+
+  .admin-drawer-logout {
+    display: flex;
+    align-items: center;
+    min-height: 43px;
+    margin-top: auto;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 14px 15px 0;
+    color: rgba(255, 255, 255, 0.66);
+    background: transparent;
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.84rem;
+    font-weight: 700;
+    text-align: left;
+  }
+  .admin-drawer-logout:hover { color: #fff; }
+
+  .admin-topbar {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px;
+  }
+  .admin-menu-button {
+    display: inline-grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #e5dbd1;
+    border-radius: 50%;
+    color: #29221e;
+    background: #fff;
+    cursor: pointer;
+  }
+  .admin-topbar-title { flex: 1; min-width: 0; }
+}
+
+@media (max-width: 620px) {
+  /* Log out lives in the drawer on small screens; keep the top bar to one row. */
+  .admin-topbar-logout,
+  .admin-profile span,
+  .admin-topbar-title p { display: none; }
+  .admin-topbar h1 { overflow: hidden; font-size: 1rem; white-space: nowrap; text-overflow: ellipsis; }
+  .admin-topbar-actions { gap: 10px; }
+}
+
+/* Description line under every admin page title: one size and spacing everywhere. */
+.admin-main :is(
+  .live-dashboard-header,
+  .booking-view-header,
+  .admin-page-heading,
+  .admin-page-header,
+  .payments-header,
+  .client-directory-heading,
+  .team-directory-header,
+  .live-todo-header,
+  .notifications-page-header
+) > div > h2 + :is(span, div, p) {
+  display: block;
+  max-width: 720px;
+  margin: 6px 0 0 !important;
+  color: #807268 !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 0.85rem !important;
+  font-weight: 400 !important;
+  letter-spacing: normal !important;
+  line-height: 1.6 !important;
+  text-transform: none !important;
+}
+
+/* Galleries / Portfolio: the page grid already spaces sections, so drop the header's extra bottom margin. */
+.admin-main .private-gallery-page > .admin-page-header { margin-bottom: 0 !important; }
+
+/* Mobile drawer height fix: on some phones 100vh / 100dvh includes the area under
+   the browser's address/navigation bar, cutting off the bottom of the drawer.
+   Pin it to the top and bottom of the visible screen instead, let it scroll when
+   the menu is taller than the screen, and keep clear of the phone's home bar. */
+@media (max-width: 860px) {
+  .admin-sidebar {
+    top: 0 !important;
+    bottom: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .admin-sidebar .admin-brand,
+  .admin-sidebar .admin-nav,
+  .admin-drawer-logout { flex-shrink: 0; }
+}
+
+/* Top bar "Log out": same hover as the other admin buttons (dark fill, white text). */
+.admin-topbar-logout { transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease; }
+.admin-topbar-logout:hover,
+.admin-topbar-logout:focus-visible { border-color: #29221e; color: #fff; background: #29221e; }
+
+/* Slightly rounded corners on admin KPI cards, panels and tables. */
+.admin-main :is(
+  .live-dashboard-cards article,
+  .live-dashboard-panel,
+  .payments-panel,
+  .client-directory-panel,
+  .team-directory-panel,
+  .live-todo-summary > div,
+  .live-todo-panel,
+  .live-todo-list li,
+  .admin-panel,
+  .private-gallery-panel,
+  .admin-package-card,
+  .booking-view-card,
+  .booking-view-calendar,
+  .booking-detail-panel,
+  .booking-calendar-events,
+  .booking-calendar-event,
+  .notifications-panel,
+  .assignments-panel,
+  .gallery-folder-card
+) {
+  border-radius: 10px;
+}
+/* Cards with a coloured header or edge-to-edge content clip it to the rounded corners. */
+.admin-main :is(.admin-package-card, .payments-panel, .client-directory-panel, .team-directory-panel, .booking-detail-panel) { overflow: hidden; }
+.admin-main :is(.live-table-wrap, .admin-table-wrap, .payments-table-wrap) { border-radius: 8px; }

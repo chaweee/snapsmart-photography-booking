@@ -75,3 +75,6 @@
 .payment-verify-amount span { color: #a28570; font-size: .65rem; font-weight: 800; letter-spacing: .1em; }
 .payment-verify-amount strong { color: #342b25; font: 400 1.7rem Georgia, serif; }
 .payment-verify-dialog .payment-reject-actions button:last-child { border-color: #342820; color: white; background: #342820; }
+
+/* Pagination sits inside the unpadded panel, under the table. */
+.payments-pagination { margin: 0; padding: 16px 22px; border-top: 1px solid #efe6de; }

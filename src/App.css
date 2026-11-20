@@ -536,3 +536,31 @@ button {
     flex-wrap: wrap;
   }
 }
+
+/* ---------- Log in / Sign up on phones ---------- */
+.auth-password-hint { font-size: .8rem; }
+@media (max-width: 600px) {
+  /* 16px text stops iPhones from zooming in when a field is tapped. */
+  .field-group input { height: 50px; font-size: 16px; }
+  .field-group label { font-size: .85rem; }
+  .auth-password-hint { font-size: .78rem; }
+}
+@media (max-width: 420px) {
+  /* First and last name stacked instead of squeezed side by side. */
+  .auth-name-row { grid-template-columns: 1fr; gap: 0; }
+}
+@media (max-width: 420px) {
+  .auth-name-row { gap: 18px; }
+}
+/* Phone / tablet: the SNAPSMART logo above the form lines up with the form's left edge. */
+@media (max-width: 900px) {
+  .mobile-brand {
+    align-self: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    max-width: 520px;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+@media (max-width: 520px) { .mobile-brand { padding-left: 4px; } }

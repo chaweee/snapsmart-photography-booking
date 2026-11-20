@@ -337,3 +337,197 @@
     font-size: 0.65rem;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Mobile menu as a slide-in drawer from the right (instead of a panel that
+   dropped down under the header), with a dimmed backdrop.
+   ------------------------------------------------------------------------- */
+.navbar-drawer-head,
+.navbar-drawer-backdrop { display: none; }
+
+@media (max-width: 940px) {
+  .navbar-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1190;
+    display: block;
+    background: rgb(20 16 14 / 45%);
+    animation: navbar-drawer-fade .2s ease;
+  }
+  @keyframes navbar-drawer-fade { from { opacity: 0; } to { opacity: 1; } }
+
+  .navbar-navigation {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0;
+    left: auto !important;
+    z-index: 1200;
+    display: flex !important;
+    flex-direction: column;
+    width: min(320px, 86vw);
+    border-top: 0 !important;
+    border-radius: 18px 0 0 18px;
+    padding: 18px 22px calc(22px + env(safe-area-inset-bottom, 0px)) !important;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: #fbfaf8;
+    box-shadow: -20px 0 60px rgb(36 29 24 / 22%) !important;
+    transform: translateX(105%);
+    visibility: hidden;
+    transition: transform .25s ease, visibility .25s;
+  }
+  .navbar-navigation.mobile-open { transform: none; visibility: visible; }
+
+  .navbar-drawer-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid #ece7e2;
+    padding-bottom: 16px;
+  }
+  .navbar-drawer-head .navbar-brand-copy { display: grid; flex: 1; gap: 2px; min-width: 0; }
+  .navbar-drawer-close {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e5dbd1;
+    border-radius: 50%;
+    color: #51463d;
+    background: #fff;
+    cursor: pointer;
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  .navbar-links a,
+  .navbar-links .navbar-link,
+  .navbar-logout-button {
+    padding: 14px 4px !important;
+    font-size: .95rem;
+  }
+  .navbar-links .navbar-link.active { color: #29221e !important; }
+
+  /* Account / log in buttons sit at the bottom of the drawer. */
+  .navbar-navigation .navbar-actions { margin-top: auto; padding-top: 22px; }
+  .navbar-navigation .navbar-book-button,
+  .navbar-navigation .navbar-account-button,
+  .navbar-navigation .navbar-login { display: flex; justify-content: center; min-height: 46px; align-items: center; border-radius: 10px; }
+  .navbar-navigation .navbar-login { border: 1px solid #ddcfc3; background: #fff; }
+}
+
+/* On mobile the header's blur (backdrop-filter) would trap the fixed drawer inside
+   the header's 74px height, so use a solid background there instead. */
+@media (max-width: 940px) {
+  .site-header {
+    background: #fbfaf8 !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Mobile: same look as the admin portal — round menu button on the LEFT of the
+   header, and a dark drawer sliding in from the left with a white active pill.
+   (Overrides the right-side drawer rules above.)
+   ------------------------------------------------------------------------- */
+@media (max-width: 940px) {
+  .navbar-container { gap: 12px; }
+  .mobile-menu-button {
+    display: grid !important;
+    flex-shrink: 0;
+    place-items: center;
+    order: -1 !important;
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    border: 1px solid #e5dbd1 !important;
+    border-radius: 50%;
+    padding: 0 !important;
+    color: #29221e;
+    background: #fff !important;
+  }
+  .mobile-menu-button svg { display: block; }
+  .site-header .navbar-container > .client-bell,
+  .site-header .navbar-container > [class*="bell"] { margin-left: auto; }
+
+  .navbar-navigation {
+    right: auto !important;
+    left: 0 !important;
+    border-radius: 0 18px 18px 0;
+    color: #fff;
+    background: #29221e !important;
+    box-shadow: 20px 0 60px rgb(0 0 0 / 28%) !important;
+    transform: translateX(-105%);
+  }
+  .navbar-drawer-head { border-bottom-color: rgba(255, 255, 255, 0.12); }
+  .navbar-drawer-head .navbar-brand-mark { width: 44px; height: 44px; border: 0; color: #29221e; background: #fff; font-style: normal; }
+  .navbar-drawer-head .navbar-brand-name { color: #fff; }
+  .navbar-drawer-head .navbar-brand-subtitle { color: rgba(255, 255, 255, 0.55); }
+  .navbar-drawer-close { border: 0 !important; color: rgba(255, 255, 255, 0.75) !important; background: rgba(255, 255, 255, 0.08) !important; }
+
+  /* Links: same as the admin sidebar. */
+  .navbar-navigation .navbar-links { gap: 4px; }
+  .navbar-navigation .navbar-links a,
+  .navbar-navigation .navbar-links .navbar-link,
+  .navbar-navigation .navbar-logout-button {
+    display: flex;
+    align-items: center;
+    min-height: 43px;
+    border: 0 !important;
+    border-radius: 14px;
+    padding: 0 15px !important;
+    color: rgba(255, 255, 255, 0.66) !important;
+    background: transparent;
+    font-size: .9rem;
+    font-weight: 700;
+    transition: color .18s ease, background-color .18s ease;
+  }
+  .navbar-navigation .navbar-links a:hover,
+  .navbar-navigation .navbar-links .navbar-link:hover,
+  .navbar-navigation .navbar-logout-button:hover { color: #fff !important; background: rgba(255, 255, 255, 0.08); }
+  .navbar-navigation .navbar-links .navbar-link.active { color: #29221e !important; background: #fff; }
+
+  /* Bottom actions on the dark drawer. */
+  .navbar-navigation .navbar-actions { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+  .navbar-navigation .navbar-role-label { color: rgba(255, 255, 255, 0.55); }
+  .navbar-navigation .navbar-login { border-color: rgba(255, 255, 255, 0.35) !important; color: #fff !important; background: transparent !important; }
+  .navbar-navigation .navbar-book-button,
+  .navbar-navigation .navbar-account-button { color: #29221e !important; background: #fff !important; }
+}
+/* ClientNotificationBell.css also sets flex order for these; on mobile keep the
+   burger first (left), the logo next, and the client bell pushed to the right. */
+@media (max-width: 940px) {
+  .site-header .client-bell-container { order: 3 !important; margin-left: auto !important; }
+}
+/* While the mobile drawer is open, lift the whole header (which contains the drawer
+   and its backdrop) above floating buttons like the chat assistant. */
+@media (max-width: 940px) {
+  .site-header:has(.navbar-navigation.mobile-open) { z-index: 5000 !important; }
+  .navbar-navigation .navbar-links { margin-top: 0; padding-top: 0; }
+}
+/* Softer, more rounded mobile drawer and buttons. */
+@media (max-width: 940px) {
+  .navbar-navigation { border-radius: 0 26px 26px 0 !important; }
+  .navbar-navigation .navbar-book-button,
+  .navbar-navigation .navbar-account-button,
+  .navbar-navigation .navbar-login { border-radius: 14px !important; }
+}
+
+/* Drawer content starts at the top (the desktop nav pushes its items to the end,
+   which pushed the whole client drawer down). The client's Log Out sits at the
+   bottom of the drawer, like the admin sidebar. */
+@media (max-width: 940px) {
+  .navbar-navigation { justify-content: flex-start !important; align-items: stretch !important; }
+  .navbar-navigation .navbar-links { display: flex; flex: 1; flex-direction: column; }
+  .navbar-navigation .navbar-links > .navbar-logout-button {
+    margin-top: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 0 !important;
+    padding-top: 14px !important;
+  }
+  .navbar-navigation:has(.navbar-actions) .navbar-links { flex: 0 0 auto; }
+}

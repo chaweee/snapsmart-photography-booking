@@ -19,6 +19,10 @@
 6. Add packages via a trusted admin workflow or SQL; package data in `src/data/packages.ts` is not automatically imported.
 7. Run `migrations/20261030000002_booking_gallery_permission.sql` after the initial migration to add the opt-in public portfolio permission. Existing bookings default to private.
 8. Run `migrations/20261030000003_gallery_admin_upload.sql` to allow authenticated admins to upload private gallery files and clean up failed uploads.
+9. Apply every remaining migration in filename order (`20261030000004` through the latest). The simplest way is the CLI on a linked project: `npx supabase db push`. Notable ones:
+   - `20261030000018_portfolio_delete.sql` lets admins delete portfolio photos. The `portfolio-delete` edge function needs this policy.
+   - `20261030000028_name_and_phone_validation.sql` rejects names that contain digits or symbols, and booking phone numbers that aren't exactly 11 digits. Existing rows are only checked when those fields change.
+   - `20261030000029_email_validation.sql` rejects booking emails without `@` and a domain ending such as `.com` or `.com.ph`.
 
 ## Auth setup
 

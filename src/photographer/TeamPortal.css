@@ -49,3 +49,61 @@
 .team-notification-list small { color: #8f8277; }
 .team-unread { margin-left: 10px; border-radius: 99px; padding: 3px 8px; color: #725641; background: #f4e9dd; font-size: .68rem; font-weight: 700; }
 @media (max-width: 500px) { .team-calendar-grid { gap: 3px; } .team-calendar-grid button { min-height: 50px; padding: 4px; } .team-calendar-grid button small { font-size: .58rem; } }
+
+/* Header styled like the admin top bar: brand mark, bell with unread badge, outline Log out. */
+.team-portal-header { font-family: Georgia, "Times New Roman", serif; }
+.team-portal-header .team-brand { display: flex; align-items: center; gap: 12px; }
+.team-portal-header .team-brand-mark { display: grid; flex-shrink: 0; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: #fff; background: #29221e; font: 400 1.25rem Georgia, "Times New Roman", serif; letter-spacing: 0; }
+.team-portal-header .team-brand > div { display: grid; gap: 3px; }
+.team-portal-header .team-brand strong { color: #29221e; font-size: .95rem; letter-spacing: .14em; }
+.team-portal-header .team-brand small { color: #927b69; font-size: .72rem; }
+.team-portal-header .team-header-actions { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.team-portal-header .team-bell { position: relative; display: grid; place-items: center; width: 43px; height: 43px; margin: 0; border: 1px solid #e5dbd1; border-radius: 50%; color: #51463d; background: #fff; text-decoration: none; transition: border-color .18s ease, background-color .18s ease; }
+.team-portal-header .team-bell:hover, .team-portal-header .team-bell:focus-visible { border-color: #a58870; background: #f8f1e9; text-decoration: none; }
+.team-portal-header .team-bell-badge { position: absolute; top: -4px; right: -4px; display: grid; place-items: center; min-width: 19px; height: 19px; border-radius: 99px; padding: 0 4px; color: #fff; background: #b65d4e; font: 800 .62rem Arial, sans-serif; }
+.team-portal-header .team-logout { border: 1px solid #ddcfc3; border-radius: 6px; padding: 8px 12px; color: #58463a; background: #fff; cursor: pointer; font: 400 .8rem Georgia, "Times New Roman", serif; transition: color .18s ease, background-color .18s ease, border-color .18s ease; }
+.team-portal-header .team-logout:hover, .team-portal-header .team-logout:focus-visible { border-color: #29221e; color: #fff; background: #29221e; }
+@media (max-width: 480px) { .team-portal-header .team-brand-mark { width: 38px; height: 38px; font-size: 1.05rem; } .team-portal-header .team-header-actions { gap: 10px; } }
+
+/* Bell dropdown: reuses the admin bell panel styles (AdminNotificationBell.css). */
+.team-portal-header .team-bell { cursor: pointer; }
+.team-portal-header .team-bell[aria-expanded="true"] { border-color: #a58870; background: #f8f1e9; }
+.team-portal-header .admin-bell-panel span,
+.team-portal-header .admin-bell-panel small { letter-spacing: normal; }
+.team-portal-header .admin-bell-heading span { color: #968779; font-size: .72rem; font-weight: 400; }
+.team-portal-header .admin-bell-item-title span { color: #9c694c; font-size: .65rem; font-weight: 800; }
+.team-portal-header .admin-bell-item-message { color: #766a60; font-size: .75rem; font-weight: 400; }
+.team-portal-header .admin-bell-item-actions button { border: 0; border-radius: 0; padding: 0; color: #805e48; background: transparent; font-size: .72rem; font-weight: 700; text-decoration: underline; }
+.team-portal-header .admin-bell-heading button { border: 0; padding: 0; color: #746a62; background: transparent; font-size: 1.4rem; font-weight: 400; }
+.team-portal-header .admin-bell-item-open { border: 0; color: inherit; background: transparent; font-weight: 400; }
+.team-portal-header .admin-bell-item-open:hover { background: #f6ede4; }
+.team-portal-header .team-bell-view-all { width: 100%; border: 0; border-top: 1px solid #f0e9e2; color: #725641; background: transparent; cursor: pointer; font: 800 .76rem Georgia, "Times New Roman", serif; }
+.team-bell-empty { margin: 0; padding: 22px 18px; color: #897b70; font-size: .8rem; }
+@media (max-width: 500px) { .team-portal-header .admin-bell-panel { right: -70px; } }
+.team-portal-header .admin-bell-item-title { display: flex; justify-content: space-between; gap: 10px; color: #40352d; font-size: .8rem; font-weight: 400; }
+.team-portal-header .admin-bell-item-title strong { font-size: .8rem; letter-spacing: normal; }
+
+/* Calendar month buttons: disabled when there are no earlier/later assignments. */
+.team-calendar-controls button:disabled { opacity: .4; cursor: not-allowed; }
+/* Center the bell icon: the old header button rule added padding that pushed it off-center. */
+.team-portal-header .team-bell { padding: 0; line-height: 0; }
+.team-portal-header .team-bell svg { display: block; }
+
+/* Personal checklist and schedule stacked full width (no longer two columns). */
+.team-portal-stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+/* Bell panel title: no wide letter spacing from the header brand style. */
+.team-portal-header .admin-bell-heading strong { color: #302821; font: 400 1.25rem Georgia, "Times New Roman", serif; letter-spacing: normal; }
+
+/* "My schedule" page title: same size as the admin page titles. */
+.team-portal .photographer-hero h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.7rem, 2.4vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: normal;
+}
+.team-portal .photographer-hero > div:first-child > span { display: block; margin-top: 6px; color: #807268; font-size: .85rem; line-height: 1.6; }
+
+/* Slightly rounded corners on team portal cards and panels (matches the admin). */
+.team-portal :is(.team-portal-summary article, .team-panel, .team-event, .team-task-list li, .team-notification-list li, .photographer-profile-card) { border-radius: 10px; }

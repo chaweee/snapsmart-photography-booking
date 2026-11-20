@@ -1,10 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/authContext";
 import { supabase } from "../lib/supabase";
 import "./AdminNotificationBell.css";
 
-type Notification = { id: string; title: string; message: string; type: string; read_at: string | null; created_at: string };
+type Notification = { id: string; title: string; message: string; type: string; booking_id: string | null; read_at: string | null; created_at: string };
+
+// Where clicking a notification takes the admin.
+const notificationTarget = (notification: Notification) => {
+  if (notification.type === "payment") return "/admin/payments";
+  if (notification.booking_id) return `/admin/bookings?booking=${encodeURIComponent(notification.booking_id)}`;
+  return "/admin/notifications";
+};
 
 export default function AdminNotificationBell() {
   const { session } = useAuth();
@@ -14,11 +21,36 @@ export default function AdminNotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState("");
   const [marking, setMarking] = useState("");
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const [openPath, setOpenPath] = useState(pathname);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close the panel whenever the admin navigates to another section.
+  if (openPath !== pathname) {
+    setOpenPath(pathname);
+    setOpen(false);
+  }
+
+  // Also close on a click outside the panel or the Escape key.
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) setOpen(false);
+    };
+    const onKeyDown = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open]);
 
   const load = useCallback(async () => {
     if (!userId) return;
     const [recent, unread] = await Promise.all([
-      supabase.from("notifications").select("id,title,message,type,read_at,created_at").eq("recipient_id", userId).order("created_at", { ascending: false }).limit(10),
+      supabase.from("notifications").select("id,title,message,type,booking_id,read_at,created_at").eq("recipient_id", userId).order("created_at", { ascending: false }).limit(10),
       supabase.from("notifications").select("id", { count: "exact", head: true }).eq("recipient_id", userId).is("read_at", null),
     ]);
     if (recent.error || unread.error) { setError("Could not load notifications."); return; }
@@ -37,6 +69,13 @@ export default function AdminNotificationBell() {
     return () => { window.clearInterval(interval); window.removeEventListener("focus", onFocus); window.removeEventListener("notifications-changed", onFocus); };
   }, [load]);
 
+  // Clicking a notification opens its page and marks it as read.
+  function openNotification(notification: Notification) {
+    setOpen(false);
+    if (!notification.read_at) void markRead(notification);
+    navigate(notificationTarget(notification));
+  }
+
   async function markRead(notification: Notification) {
     if (!userId || marking || notification.read_at) return;
     setMarking(notification.id); setError("");
@@ -51,7 +90,7 @@ export default function AdminNotificationBell() {
     finally { setMarking(""); }
   }
 
-  return <div className="admin-bell-container">
+  return <div className="admin-bell-container" ref={containerRef}>
     <button className="admin-bell-button" type="button" aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`} aria-expanded={open} aria-controls="admin-notification-panel" onClick={() => { setOpen((current) => !current); void load(); }}>
       <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" /><path d="M10 21h4" /></svg>
       {unreadCount > 0 && <span className="admin-bell-badge">{unreadCount > 99 ? "99+" : unreadCount}</span>}
@@ -61,9 +100,11 @@ export default function AdminNotificationBell() {
       {error && <p className="admin-bell-empty" role="alert">{error}</p>}
       {!error && notifications.length === 0 && <p className="admin-bell-empty">No notifications yet.</p>}
       <ul className="admin-bell-list">{notifications.map((notification) => <li key={notification.id} className={notification.read_at ? "" : "unread"}>
-        <div className="admin-bell-item-title"><strong>{notification.title}</strong>{!notification.read_at && <span>New</span>}</div>
-        <p>{notification.message}</p><time dateTime={notification.created_at}>{new Date(notification.created_at).toLocaleString()}</time>
-        <div className="admin-bell-item-actions">{notification.type === "payment" && <Link to="/admin/payments" onClick={() => setOpen(false)}>View payments</Link>}{!notification.read_at && <button type="button" disabled={!!marking} onClick={() => void markRead(notification)}>{marking === notification.id ? "Saving..." : "Mark read"}</button>}</div>
+        <button type="button" className="admin-bell-item-open" onClick={() => openNotification(notification)}>
+          <span className="admin-bell-item-title"><strong>{notification.title}</strong>{!notification.read_at && <span>New</span>}</span>
+          <span className="admin-bell-item-message">{notification.message}</span><time dateTime={notification.created_at}>{new Date(notification.created_at).toLocaleString()}</time>
+        </button>
+        {!notification.read_at && <div className="admin-bell-item-actions"><button type="button" disabled={!!marking} onClick={() => void markRead(notification)}>{marking === notification.id ? "Saving..." : "Mark read"}</button></div>}
       </li>)}</ul>
       <Link className="admin-bell-view-all" to="/admin/notifications" onClick={() => setOpen(false)}>View all notifications →</Link>
     </div>}

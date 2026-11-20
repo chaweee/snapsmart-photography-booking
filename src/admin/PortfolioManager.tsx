@@ -1,5 +1,8 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "../lib/supabase";
+import { useToastMessage } from "../lib/toast";
+import Pagination from "../components/Pagination";
+import { clampPage, pageSlice } from "../lib/pagination";
 import "../gallery.css";
 
 type Photo = { id: string; title: string; image_url: string };
@@ -29,8 +32,11 @@ export default function PortfolioManager() {
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  // Messages are shown as toasts; errors vs. successes are told apart by their wording.
+  useToastMessage(message, setMessage);
   const [revision, setRevision] = useState(0);
   const [inputKey, setInputKey] = useState(0);
+  const [page, setPage] = useState(1);
   useEffect(() => {
     let active = true;
     void supabase.from("portfolio_photos").select("id,title,image_url").order("created_at", { ascending: false }).then(({ data, error }) => {
@@ -84,12 +90,12 @@ export default function PortfolioManager() {
     finally { setBusy(false); }
   }
   return <section className="private-gallery-page"><div className="admin-page-header"><div><p>SHOWCASE</p><h2>Public portfolio</h2><span>Photos here are visible to everyone, including visitors who are not logged in.</span></div></div>
-    {message && <p className="private-gallery-message" role="status">{message}</p>}
+    
     <form className="private-gallery-panel portfolio-upload-panel" onSubmit={upload}>
       <div className="portfolio-upload-heading"><span>YOUR SHOWCASE</span><h3>Add portfolio photos</h3><p>Only upload photos you have permission to publish. Private client galleries remain separate.</p></div>
       <label className="gallery-file-picker portfolio-file-picker"><input key={inputKey} type="file" multiple required disabled={busy} accept="image/jpeg,image/png,image/webp" onChange={(event) => setFiles(Array.from(event.target.files ?? []))} /><span className="gallery-file-icon" aria-hidden="true">↑</span><span className="gallery-file-copy"><strong>{files.length ? `${files.length} ${files.length === 1 ? "photo" : "photos"} selected` : "Choose photos to upload"}</strong><small>{files.length ? files.map((file) => file.name).join(", ") : "Select up to 5 photos · JPEG, PNG or WebP"}</small></span><span className="gallery-file-browse" aria-hidden="true">Browse files</span></label>
       <div className="portfolio-upload-footer"><p>Up to 25 MB each. Large photos are compressed or resized for Cloudinary; keep the originals separately.</p><button type="submit" disabled={busy || !files.length}>{busy ? "Preparing and uploading..." : "Upload and publish →"}</button></div>
     </form>
-    <div className="private-gallery-panel"><h3>Published photos</h3>{photos.length ? <div className="gallery-admin-photo-grid">{photos.map((photo) => <div className="gallery-admin-photo" key={photo.id}><img src={photo.image_url} alt="Portfolio photo" loading="lazy" /><button type="button" disabled={busy} onClick={() => void deletePhoto(photo)}>Delete photo</button></div>)}</div> : <p>No published photos yet.</p>}</div>
+    <div className="private-gallery-panel"><h3>Published photos</h3>{photos.length ? <div className="gallery-admin-photo-grid">{pageSlice(photos, clampPage(page, photos.length)).map((photo) => <div className="gallery-admin-photo" key={photo.id}><img src={photo.image_url} alt="Portfolio photo" loading="lazy" /><button type="button" disabled={busy} onClick={() => void deletePhoto(photo)}>Delete photo</button></div>)}</div> : <p>No published photos yet.</p>}<Pagination className="admin-list-pagination" page={clampPage(page, photos.length)} total={photos.length} onChange={setPage} itemLabel="photos" /></div>
   </section>;
 }
