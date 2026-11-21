@@ -85,6 +85,7 @@
 .client-gallery-masonry { columns: 3; column-gap: 16px; }
 .client-gallery-photo { display: block; width: 100%; margin: 0 0 16px; padding: 0; overflow: hidden; break-inside: avoid; border: 0; background: #f1ebe5; cursor: pointer; }
 .client-gallery-photo img { display: block; width: 100%; height: auto; transition: transform 450ms ease; }
+.client-gallery-photo img[aria-busy="true"] { aspect-ratio: 4 / 3; background: #f1ebe5; }
 .client-gallery-photo:hover img { transform: scale(1.025); }
 .client-gallery-photo:focus-visible { outline: 3px solid #9d7d64; outline-offset: 3px; }
 .client-gallery-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }

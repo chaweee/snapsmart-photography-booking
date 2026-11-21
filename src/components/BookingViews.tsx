@@ -6,12 +6,54 @@ import { useAuth } from "../auth/authContext";
 import "./BookingViews.css";
 import Pagination from "./Pagination";
 import { clampPage, pageOfIndex, pageSlice } from "../lib/pagination";
+import { estimatedDeliverablesDate } from "../lib/deliverables";
+import ConfirmDialog from "./ConfirmDialog";
 
-type Booking = { id: string; client_name: string; client_email: string | null; client_phone: string | null; client_address: string | null; package_id: string | null; package_snapshot: { name?: string; subtitle?: string; inclusions?: string[] } | null; event_type: string; other_event_type: string | null; event_date: string; start_time: string | null; end_time: string | null; event_location: string; church_location: string | null; theme_motif: string | null; bride_name: string | null; groom_name: string | null; notes: string | null; status: string; total_amount: number; required_down_payment: number; public_gallery_permission: boolean; preferred_photographer_id: string | null; preferred_videographer_id: string | null; is_test: boolean };
+type Booking = { id: string; client_id: string | null; client_name: string; client_email: string | null; client_phone: string | null; client_address: string | null; package_id: string | null; package_snapshot: { name?: string; subtitle?: string; inclusions?: string[] } | null; event_type: string; other_event_type: string | null; event_date: string; start_time: string | null; end_time: string | null; event_location: string; church_location: string | null; theme_motif: string | null; bride_name: string | null; groom_name: string | null; notes: string | null; status: string; total_amount: number; required_down_payment: number; public_gallery_permission: boolean; preferred_photographer_id: string | null; preferred_videographer_id: string | null; is_test: boolean };
 type TeamMember = { id: string; full_name: string };
 type Payment = { id: string; amount: number; method: string; status: string };
 const money = (value: number) => new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(value);
 const dateLabel = (date: string) => { const [year, month, day] = date.split("-").map(Number); return new Date(year, month - 1, day).toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" }); };
+
+function DeliverablesStatus({ booking, isClient }: { booking: Booking; isClient: boolean }) {
+  const [readyAt, setReadyAt] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [confirmReady, setConfirmReady] = useState(false);
+  const estimatedDate = estimatedDeliverablesDate(booking.event_date);
+  const eligible = ["Confirmed", "Completed"].includes(booking.status);
+
+  useEffect(() => {
+    let active = true;
+    void Promise.resolve(supabase.from("booking_deliverables").select("ready_at").eq("booking_id", booking.id).maybeSingle()).then(({ data, error: loadError }) => {
+      if (!active) return;
+      if (loadError) setError("Deliverables status is unavailable. Please contact the studio.");
+      else setReadyAt(data?.ready_at ?? null);
+      setLoading(false);
+    }).catch(() => { if (active) { setError("Deliverables status is unavailable. Please contact the studio."); setLoading(false); } });
+    return () => { active = false; };
+  }, [booking.id]);
+
+  async function markReady() {
+    if (busy) return;
+    setBusy(true); setActionError(""); setNotice("");
+    try {
+      const { error: saveError } = await supabase.rpc("mark_deliverables_ready", { p_booking_id: booking.id });
+      if (saveError) throw new Error(saveError.message);
+      const { data, error: checkError } = await supabase.from("booking_deliverables").select("ready_at").eq("booking_id", booking.id).single();
+      if (checkError || !data) throw new Error(checkError?.message ?? "Could not confirm the saved status. Refresh the booking before retrying.");
+      setReadyAt(data.ready_at);
+      setNotice(booking.client_id ? "Ready status saved. If the client account is linked, an in-app notification has been created." : "Ready status saved. No client account is linked; delivery of a notification requires a linked client and the scheduler to be running.");
+    } catch (failure) { setActionError(failure instanceof Error ? failure.message : "Unable to update deliverables."); }
+    finally { setBusy(false); setConfirmReady(false); }
+  }
+
+  if (!eligible || !estimatedDate) return null;
+  return <section className="booking-deliverables"><span>DELIVERABLES</span><h4>Estimated release: {dateLabel(estimatedDate)}</h4><p>Estimate only, two calendar months after your event. Actual readiness must be confirmed by the studio.</p>{loading ? <p role="status">Loading status...</p> : error ? <p role="alert">{error}</p> : <><strong>{readyAt ? "Ready for collection" : "Not yet confirmed ready"}</strong>{readyAt && <p>Please contact Toni Photography to arrange collection.</p>}{!isClient && !readyAt && <><p>Mark ready only after all deliverables for this booking are ready.</p><button className="booking-view-primary" type="button" disabled={busy} onClick={() => { setActionError(""); setConfirmReady(true); }}>Mark deliverables ready</button></>}{actionError && <p role="alert">{actionError}</p>}{notice && <p role="status">{notice}</p>}</>}<ConfirmDialog open={confirmReady} title="Mark deliverables ready?" message={booking.client_id ? "Confirm that all deliverables are ready for collection. The linked client will receive an in-app notification." : "Confirm that all deliverables are ready for collection. This booking has no linked client account, so no notification can be delivered yet."} confirmLabel="Yes, mark ready" busy={busy} onConfirm={() => void markReady()} onCancel={() => setConfirmReady(false)} /></section>;
+}
 
 function AdditionalPayment({ booking, remaining, onClose, onSubmitted }: { booking: Booking; remaining: number; onClose: () => void; onSubmitted: () => void }) {
   const { session } = useAuth();
@@ -109,6 +151,7 @@ function BookingDetails({ booking, isClient, onPaymentSubmitted }: { booking: Bo
     }
   }
   return <aside className="booking-view-detail"><span className="booking-view-eyebrow">BOOKING DETAILS</span><h3>{booking.package_snapshot?.name || booking.package_id || "Package unavailable"}</h3><p>{booking.id}</p><div className="booking-view-badges"><span>{booking.status}</span>{booking.is_test && <span>TEST — not a real reservation</span>}</div><dl className="booking-view-detail-grid">{fields.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+    <DeliverablesStatus key={booking.id} booking={booking} isClient={isClient} />
     <div className="booking-view-payment"><h4>Payment records</h4>{paymentLoading ? <p>Loading payments...</p> : paymentError ? <p role="alert">Could not load payments: {paymentError}</p> : <><p>Verified total: <strong>{money(verified)}</strong>{booking.is_test && " (simulated)"}</p>{payments.length ? <ul>{payments.map((payment) => <li key={payment.id}>{payment.method} · {money(Number(payment.amount))} · {payment.status}</li>)}</ul> : <p>No payment records yet.</p>}</>}</div>
     {isClient && !booking.is_test && booking.status === "Payment Insufficient" && !paymentLoading && !paymentError && <div className="booking-payment-shortage"><strong>{payments.some((payment) => payment.status === "Rejected") ? "Payment proof needs attention" : "Additional payment needed"}</strong><p>Remaining down payment based on verified payments: {money(remaining)}. Submit a proof for admin review. If you already paid, contact the administrator before sending another payment.</p><button type="button" className="booking-view-primary" onClick={() => setAdditionalOpen(true)}>Send another payment</button></div>}
     {["Confirmed", "Completed"].includes(booking.status) ? <button className="booking-view-primary" type="button" disabled={paymentLoading || !!paymentError} onClick={() => setReceiptOpen(true)}>View contract receipt</button> : <p>Receipt will be available once the booking is confirmed.</p>}
@@ -160,7 +203,7 @@ export default function BookingViews({ mode }: { mode: "admin" | "client" | "cal
       }
       const all: Booking[] = [];
       for (let offset = 0; ; offset += 500) {
-        let query = supabase.from("bookings").select("id,client_name,client_email,client_phone,client_address,package_id,package_snapshot,event_type,other_event_type,event_date,start_time,end_time,event_location,church_location,theme_motif,bride_name,groom_name,notes,status,total_amount,required_down_payment,public_gallery_permission,preferred_photographer_id,preferred_videographer_id,is_test");
+        let query = supabase.from("bookings").select("id,client_id,client_name,client_email,client_phone,client_address,package_id,package_snapshot,event_type,other_event_type,event_date,start_time,end_time,event_location,church_location,theme_motif,bride_name,groom_name,notes,status,total_amount,required_down_payment,public_gallery_permission,preferred_photographer_id,preferred_videographer_id,is_test");
         if (mode === "client") query = query.eq("client_id", userId);
         const { data, error: loadError } = await query.order("event_date", { ascending: false }).order("id").range(offset, offset + 499);
         if (loadError) throw loadError;

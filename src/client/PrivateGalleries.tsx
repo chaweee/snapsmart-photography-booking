@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
+import PrivateGalleryImage from "../components/PrivateGalleryImage";
 import "./Client.css";
 import "../gallery.css";
 
 type Gallery = { id: string; title: string; booking_id: string };
-type Photo = { id: string; gallery_id: string; file_path: string; url: string };
+type Photo = { id: string; gallery_id: string; file_path: string };
 
 export default function PrivateGalleries() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
@@ -30,12 +31,7 @@ export default function PrivateGalleries() {
       if (!galleryData.length) return { galleryData, photos: [] as Photo[] };
       const { data: itemData, error: itemError } = await supabase.from("gallery_items").select("id, gallery_id, file_path").in("gallery_id", galleryData.map((gallery) => gallery.id)).order("created_at");
       if (itemError) throw itemError;
-      const signedPhotos = await Promise.all(itemData.map(async (item) => {
-        const { data, error: signError } = await supabase.storage.from("gallery-files").createSignedUrl(item.file_path, 3600);
-        if (signError) throw signError;
-        return { ...item, url: data.signedUrl };
-      }));
-      return { galleryData, photos: signedPhotos };
+      return { galleryData, photos: itemData };
     }
     void load().then((result) => {
       if (!active) return;
@@ -103,13 +99,13 @@ export default function PrivateGalleries() {
       const galleryPhotos = photos.filter((photo) => photo.gallery_id === gallery.id);
       return <article className="clean-gallery-album" key={gallery.id}><div className="clean-gallery-header"><div><span>Private client gallery</span><h3>{gallery.title}</h3><p>{galleryPhotos.length} photo(s)</p></div><div className="client-gallery-actions"><strong className="client-gallery-status available">Available</strong>{galleryPhotos.length > 0 && <button type="button" className="client-gallery-zip" disabled={!!downloading} onClick={() => void downloadGallery(gallery, galleryPhotos)}>{downloading === `zip:${gallery.id}` ? "Preparing ZIP..." : "↓ Download all (ZIP)"}</button>}</div></div>
         {downloading === `zip:${gallery.id}` && <p className="client-gallery-zip-progress" role="status">{zipProgress}</p>}
-        <div className="client-gallery-masonry">{galleryPhotos.map((photo, index) => <button className="client-gallery-photo" type="button" key={photo.id} onClick={() => setViewer({ galleryId: gallery.id, photoId: photo.id })} aria-label={`Open ${gallery.title} photo ${index + 1}`}><img src={photo.url} alt="" loading="lazy" /></button>)}</div>
+        <div className="client-gallery-masonry">{galleryPhotos.map((photo, index) => <button className="client-gallery-photo" type="button" key={photo.id} onClick={() => setViewer({ galleryId: gallery.id, photoId: photo.id })} aria-label={`Open ${gallery.title} photo ${index + 1}`}><PrivateGalleryImage path={photo.file_path} alt="" lazy /></button>)}</div>
         {!galleryPhotos.length && <p>No photos available in this gallery yet.</p>}
       </article>;
     })}
     {viewer && currentPhoto && <dialog ref={dialog} className="client-photo-viewer" aria-label={`${currentGallery?.title || "Gallery"} photo viewer`} onClose={() => setViewer(null)} onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close(); }} onKeyDown={(event) => { if (event.key === "ArrowLeft") { event.preventDefault(); move(-1); } if (event.key === "ArrowRight") { event.preventDefault(); move(1); } }}>
       <div className="client-photo-viewer-top"><div><span>PRIVATE GALLERY</span><strong>{currentGallery?.title}</strong></div><div><small>{currentIndex + 1} / {viewerPhotos.length}</small><button type="button" className="client-photo-close" aria-label="Close photo viewer" onClick={() => dialog.current?.close()}>×</button></div></div>
-      <div className="client-photo-stage"><button type="button" className="client-photo-arrow" aria-label="Previous photo" disabled={viewerPhotos.length < 2} onClick={() => move(-1)}>←</button><img src={currentPhoto.url} alt={`${currentGallery?.title || "Gallery"} photo ${currentIndex + 1}`} /><button type="button" className="client-photo-arrow" aria-label="Next photo" disabled={viewerPhotos.length < 2} onClick={() => move(1)}>→</button></div>
+      <div className="client-photo-stage"><button type="button" className="client-photo-arrow" aria-label="Previous photo" disabled={viewerPhotos.length < 2} onClick={() => move(-1)}>←</button><PrivateGalleryImage key={currentPhoto.id} path={currentPhoto.file_path} alt={`${currentGallery?.title || "Gallery"} photo ${currentIndex + 1}`} /><button type="button" className="client-photo-arrow" aria-label="Next photo" disabled={viewerPhotos.length < 2} onClick={() => move(1)}>→</button></div>
       <div className="client-photo-viewer-bottom">{error && <p role="alert">{error}</p>}<button type="button" className="client-photo-download" disabled={!!downloading} onClick={() => void download(currentPhoto)}>{downloading === currentPhoto.id ? "Downloading..." : "↓  Download original"}</button></div>
     </dialog>}
   </section>;

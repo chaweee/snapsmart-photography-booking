@@ -34,6 +34,11 @@
 .booking-view-detail-grid dt, .booking-agreement-snapshot-details dt { color: #98877a; font-size: .65rem; font-weight: 800; text-transform: uppercase; }
 .booking-view-detail-grid dd, .booking-agreement-snapshot-details dd { margin: 6px 0 0; overflow-wrap: anywhere; white-space: pre-wrap; font-size: .8rem; line-height: 1.5; }
 .booking-view-payment { border-top: 1px solid #eee7df; padding-top: 14px; color: #74685f; font-size: .8rem; line-height: 1.6; }
+.booking-deliverables { margin: 18px 0; padding: 16px; border: 1px solid #e8d8ca; background: #fcf7f1; color: #66574b; font-size: .8rem; line-height: 1.6; }
+.booking-deliverables > span { color: #987b65; font-size: .66rem; font-weight: 800; letter-spacing: .12em; }
+.booking-deliverables h4 { margin: 6px 0; color: #342b25; font: 400 1.1rem Georgia, serif; }
+.booking-deliverables p { margin: 8px 0; }
+.booking-deliverables strong { color: #584434; }
 .booking-view-payment h4 { color: #342b25; }
 .booking-view-payment ul { padding-left: 18px; }
 .booking-payment-shortage { margin: 16px 0; border: 1px solid #e7d1b1; padding: 15px; color: #725438; background: #fff8e8; font-size: .8rem; line-height: 1.6; }

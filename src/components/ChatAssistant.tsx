@@ -34,9 +34,13 @@ export default function ChatAssistant() {
     setMessages(next); setInput(""); setBusy(true); setError("");
     try {
       const { data, error: invokeError } = await supabase.functions.invoke("chat-assistant", { body: { messages: next.slice(-10) } });
-      if (invokeError || typeof data?.message !== "string") throw new Error("unavailable");
+      if (invokeError) {
+        if (invokeError.context instanceof Response && invokeError.context.status === 429) throw new Error("Chat is busy or has reached its usage limit. Please try again later.");
+        throw new Error("Chat is temporarily unavailable. Please try again later.");
+      }
+      if (typeof data?.message !== "string") throw new Error("Chat returned an unexpected response. Please try again later.");
       setMessages((current) => [...current, { role: "assistant", content: data.message }]);
-    } catch { setError("Sorry, chat is unavailable or busy. Please try again later."); }
+    } catch (failure) { setError(failure instanceof Error ? failure.message : "Sorry, chat is unavailable or busy. Please try again later."); }
     finally { setBusy(false); }
   }
 
